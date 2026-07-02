@@ -1,0 +1,84 @@
+<svg viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>User flow for the AI Use Case Rating Module, Creative domain</title>
+<desc>Flow from entry (direct or shared-link arrival) through domain intro, a per-use-case rate loop with progress tracking, to domain completion or mid-flow drop-off.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<path d="M0,0 L10,5 L0,10 z" fill="#5F5E5A"/>
+</marker>
+</defs>
+<style>
+.box { fill: #FFFFFF; stroke: #D3D1C7; stroke-width:1.5; }
+.decision { fill: #F1EFE8; stroke: #D3D1C7; stroke-width:1.5; }
+.end { fill: #FFFFFF; stroke: #2C2C2A; stroke-width:2; }
+.entry { fill: #2C2C2A; }
+.title { font-size:14px; font-weight:600; fill: #2C2C2A; font-family: Arial, sans-serif; }
+.sub { font-size:11px; fill: #5F5E5A; font-family: Arial, sans-serif; }
+.label { font-size:11px; fill: #5F5E5A; font-family: Arial, sans-serif; }
+.entrylabel { font-size:12px; font-weight:600; fill: #FFFFFF; font-family: Arial, sans-serif; }
+.edge { stroke: #5F5E5A; stroke-width:1.5; fill:none; marker-end:url(#arrow); }
+</style>
+
+<ellipse cx="500" cy="30" rx="70" ry="24" class="entry"/>
+<text x="500" y="35" text-anchor="middle" class="entrylabel">Visitor arrives</text>
+
+<polygon points="500,70 590,110 500,150 410,110" class="decision"/>
+<text x="500" y="106" text-anchor="middle" class="title">Arrival</text>
+<text x="500" y="122" text-anchor="middle" class="sub">type?</text>
+
+<path class="edge" d="M500,54 L500,70"/>
+
+<rect x="260" y="190" width="180" height="60" class="box"/>
+<text x="350" y="215" text-anchor="middle" class="title">Landing screen</text>
+<text x="350" y="233" text-anchor="middle" class="sub">explains concept in less than 10s</text>
+<path class="edge" d="M450,125 L350,190" />
+<text x="380" y="160" class="label">direct / organic</text>
+
+<rect x="560" y="190" width="200" height="70" class="box"/>
+<text x="660" y="213" text-anchor="middle" class="title">Landing screen</text>
+<text x="660" y="230" text-anchor="middle" class="sub">+ sharer's profile preview</text>
+<text x="660" y="246" text-anchor="middle" class="sub">"see how yours compares"</text>
+<path class="edge" d="M550,125 L660,190" />
+<text x="600" y="160" class="label">shared link</text>
+
+<rect x="410" y="300" width="180" height="50" class="box"/>
+<text x="500" y="330" text-anchor="middle" class="title">Taps "Start rating"</text>
+<path class="edge" d="M350,250 L470,300"/>
+<path class="edge" d="M660,260 L530,300"/>
+
+<rect x="400" y="380" width="200" height="60" class="box"/>
+<text x="500" y="405" text-anchor="middle" class="title">Domain intro</text>
+<text x="500" y="423" text-anchor="middle" class="sub">Creative: music, writing, art</text>
+<path class="edge" d="M500,350 L500,380"/>
+
+<rect x="280" y="470" width="190" height="70" class="box"/>
+<text x="375" y="495" text-anchor="middle" class="title">Use case card</text>
+<text x="375" y="512" text-anchor="middle" class="sub">description shown first</text>
+<text x="375" y="527" text-anchor="middle" class="sub">(2 sentences max, jargon-free)</text>
+<path class="edge" d="M470,410 L375,470"/>
+
+<rect x="530" y="470" width="190" height="70" class="box"/>
+<text x="625" y="495" text-anchor="middle" class="title">Rates use case</text>
+<text x="625" y="512" text-anchor="middle" class="sub">scale input (mechanic TBD)</text>
+<text x="625" y="527" text-anchor="middle" class="sub">progress bar advances</text>
+<path class="edge" d="M470,505 L530,505"/>
+
+<polygon points="500,580 590,620 500,660 410,620" class="decision"/>
+<text x="500" y="616" text-anchor="middle" class="title">More use</text>
+<text x="500" y="632" text-anchor="middle" class="sub">cases left?</text>
+<path class="edge" d="M580,540 L520,580"/>
+
+<path class="edge" d="M430,610 C280,610 280,505 280,505" />
+<text x="200" y="600" class="label">yes to next card</text>
+
+<ellipse cx="740" cy="620" rx="110" ry="30" class="end"/>
+<text x="740" y="616" text-anchor="middle" class="title">Leaves mid-domain</text>
+<text x="740" y="632" text-anchor="middle" class="sub">no penalty, no save (v1)</text>
+<path class="edge" d="M600,510 C700,540 740,570 740,590" stroke-dasharray="4,3"/>
+<text x="700" y="560" class="label">closes / navigates away</text>
+
+<ellipse cx="500" cy="740" rx="130" ry="34" class="end"/>
+<text x="500" y="736" text-anchor="middle" class="title">Domain ratings complete</text>
+<text x="500" y="753" text-anchor="middle" class="sub">to Results (Feature 2)</text>
+<path class="edge" d="M500,660 L500,706"/>
+<text x="530" y="685" class="label">no</text>
+</svg>
