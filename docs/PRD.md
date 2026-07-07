@@ -1,5 +1,5 @@
 # PRD: AI Use Case Sentiment Explorer
-**Status:** Draft v0.3 — Early Exploration
+**Status:** Draft v0.4 — Early Exploration
 **Audience:** Millennials & Gen Z consumers (U.S.)
 **Stage:** Pre-design / Concept
 
@@ -59,13 +59,18 @@ As AI tooling becomes more prevalent across creative, professional, and personal
 
 **1. AI Use Case Rating Module**
 - Visitors rate each AI use case on a scale to be finalized (see Open Questions #1). Rating scale options under consideration and to be decided by Design: **(a) human ↔ AI** (where does this use case sit on the authorship spectrum?) and **(b) uneasy ↔ enthusiastic** (how do you feel about this use case?). Additional narrative framings to explore: **(c) should exist ↔ should not exist** (a normative/ethical axis), **(d) replaces humans ↔ augments humans** (a labor/agency axis), **(e) trust ↔ distrust** (a credibility axis). Each framing produces meaningfully different data and a different emotional experience for visitors — this decision is a **design team action item**.
-- Use cases are organized into discrete **domains**, each published as a self-contained phase. Confirmed domains include: Creative (music, writing, visual art), Productivity (writing assistance, code), Personal (therapy, companionship, coaching), Civic/Professional (legal, medical, education). Additional domains may be added in future epics.
+- Use cases are organized into discrete **domains**, each with one or more **subdomains**, each published as a self-contained phase. Confirmed domains and their subdomains, sourced from the Notion `AI-use-cases` database (103 use cases total): **Healthcare** (Diagnostics, Mental Health, Wellness & Fit Tracking, Disease Management/RPM, Robotics, Reproductive Health, End of Life), **Finances** (Finance Advisement, Wealth Management, Consumer Credit, Banking, Insurance, Real Estate), **Home & Personal Life** (Robotics, Home Management, Personal Assistance, Relationships), **Leisure & Hospitality** (Leisure, Travel), **Robotics** (Retail, Food Supply, Public Safety, Housing Supply, Hospitality), **Productivity** (Personal Assistance, Time Management, Media Management), **Mobility** (Autonomous Vehicles, Travel, Automotive, Insurance), **Education** (Skill Development, Career Development, Higher Education, K-12, Consumer Credit), **Legal & Public Services** (Accounting, Government Benefits, Public Services, Consumer Protection, Legal Self-Serve, Identity, Housekeeping), and **Media & Culture** (Writing, Film & TV, Visual Arts, Music, Fashion). Additional domains and subdomains may be added in future epics via new Notion records — no schema changes required.
 - Each domain is developed and released independently, allowing continuous delivery. The app must support incremental domain addition without requiring a full re-deploy.
-- Each use case includes a short, plain-language description (≤2 sentences) — no assumed AI knowledge required.
+- Each use case may include a short, plain-language description (≤2 sentences) — descriptions are optional per use case; when present, they require no assumed AI knowledge to understand.
+- If a use case has no description, or a visitor doesn't understand it as written, the visitor can request that an explanation/description be added to it. This is a lightweight flag/request action, not a live AI-generated explanation — requests are queued for the content team to address.
+- If a visitor rates a use case as **should not exist**, **uneasy**, or **distrust** (whichever negative pole applies under the selected rating axis, see Open Questions #1), they are offered an optional free-text field to explain why they chose that rating. This field is never required and only appears after one of these specific negative ratings is selected — it is not shown for neutral or positive ratings.
 - Acceptance criteria:
   - [ ] A visitor can complete all ratings in a single session without account creation
-  - [ ] Each use case is presented with its description visible before rating
+  - [ ] Each use case is presented with its description visible before rating, when a description exists for that use case
   - [ ] Use case descriptions are jargon-free and require no prior AI knowledge to understand
+  - [ ] A visitor can request an explanation/description be added to a use case, whether or not it currently has one
+  - [ ] A visitor who rates a use case as should not exist, uneasy, or distrust is shown an optional free-text field asking why
+  - [ ] The optional free-text field does not appear for any other rating value
   - [ ] The interaction is touch and mouse compatible
   - [ ] Progress is visible so visitors know how far along they are within a domain
   - [ ] New domains can be added to the app without breaking existing domain data or visitor flows
