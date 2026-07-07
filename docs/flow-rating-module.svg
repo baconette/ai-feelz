@@ -1,84 +1,120 @@
-<svg viewBox="0 0 1000 900" xmlns="http://www.w3.org/2000/svg" role="img">
-<title>User flow for the AI Use Case Rating Module, Creative domain</title>
-<desc>Flow from entry (direct or shared-link arrival) through domain intro, a per-use-case rate loop with progress tracking, to domain completion or mid-flow drop-off.</desc>
+<svg viewBox="0 0 1100 1240" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Feature 1 user flow, updated for PRD v0.5 bundle model</title>
+<desc>Restores the arrival-type decision before start rating. Domain intro removed; visitor rates 10-use-case randomized bundles with no visible domain grouping. After each bundle, visitor chooses to view cumulative results or continue with another randomized bundle. Includes optional description handling, request-explanation action, and a conditional free-text "why" field on negative-pole ratings.</desc>
 <defs>
-<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+<marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
 <path d="M0,0 L10,5 L0,10 z" fill="#5F5E5A"/>
 </marker>
 </defs>
 <style>
 .box { fill: #FFFFFF; stroke: #D3D1C7; stroke-width:1.5; }
 .decision { fill: #F1EFE8; stroke: #D3D1C7; stroke-width:1.5; }
+.optional { fill: #FFFFFF; stroke: #D3D1C7; stroke-width:1.5; stroke-dasharray:4,3; }
 .end { fill: #FFFFFF; stroke: #2C2C2A; stroke-width:2; }
 .entry { fill: #2C2C2A; }
 .title { font-size:14px; font-weight:600; fill: #2C2C2A; font-family: Arial, sans-serif; }
 .sub { font-size:11px; fill: #5F5E5A; font-family: Arial, sans-serif; }
 .label { font-size:11px; fill: #5F5E5A; font-family: Arial, sans-serif; }
 .entrylabel { font-size:12px; font-weight:600; fill: #FFFFFF; font-family: Arial, sans-serif; }
-.edge { stroke: #5F5E5A; stroke-width:1.5; fill:none; marker-end:url(#arrow); }
+.edge { stroke: #5F5E5A; stroke-width:1.5; fill:none; marker-end:url(#arrow2); }
 </style>
 
-<ellipse cx="500" cy="30" rx="70" ry="24" class="entry"/>
-<text x="500" y="35" text-anchor="middle" class="entrylabel">Visitor arrives</text>
+<ellipse cx="550" cy="30" rx="70" ry="24" class="entry"/>
+<text x="550" y="35" text-anchor="middle" class="entrylabel">Visitor arrives</text>
+<path class="edge" d="M550,54 L550,70"/>
 
-<polygon points="500,70 590,110 500,150 410,110" class="decision"/>
-<text x="500" y="106" text-anchor="middle" class="title">Arrival</text>
-<text x="500" y="122" text-anchor="middle" class="sub">type?</text>
+<polygon points="550,70 650,110 550,150 450,110" class="decision"/>
+<text x="550" y="106" text-anchor="middle" class="title">Arrival</text>
+<text x="550" y="122" text-anchor="middle" class="sub">type?</text>
 
-<path class="edge" d="M500,54 L500,70"/>
-
-<rect x="260" y="190" width="180" height="60" class="box"/>
-<text x="350" y="215" text-anchor="middle" class="title">Landing screen</text>
-<text x="350" y="233" text-anchor="middle" class="sub">explains concept in less than 10s</text>
-<path class="edge" d="M450,125 L350,190" />
+<rect x="330" y="190" width="180" height="60" class="box"/>
+<text x="420" y="215" text-anchor="middle" class="title">Landing screen</text>
+<text x="420" y="233" text-anchor="middle" class="sub">explains concept in &lt;10s</text>
+<path class="edge" d="M450,110 L420,190"/>
 <text x="380" y="160" class="label">direct / organic</text>
 
-<rect x="560" y="190" width="200" height="70" class="box"/>
-<text x="660" y="213" text-anchor="middle" class="title">Landing screen</text>
-<text x="660" y="230" text-anchor="middle" class="sub">+ sharer's profile preview</text>
-<text x="660" y="246" text-anchor="middle" class="sub">"see how yours compares"</text>
-<path class="edge" d="M550,125 L660,190" />
-<text x="600" y="160" class="label">shared link</text>
+<rect x="590" y="190" width="200" height="70" class="box"/>
+<text x="690" y="213" text-anchor="middle" class="title">Landing screen</text>
+<text x="690" y="230" text-anchor="middle" class="sub">+ sharer's profile preview</text>
+<text x="690" y="246" text-anchor="middle" class="sub">"see how yours compares"</text>
+<path class="edge" d="M650,110 L690,190"/>
+<text x="640" y="160" class="label">shared link</text>
 
-<rect x="410" y="300" width="180" height="50" class="box"/>
-<text x="500" y="330" text-anchor="middle" class="title">Taps "Start rating"</text>
-<path class="edge" d="M350,250 L470,300"/>
-<path class="edge" d="M660,260 L530,300"/>
+<rect x="440" y="300" width="220" height="60" class="box"/>
+<text x="550" y="327" text-anchor="middle" class="title">Start rating</text>
+<text x="550" y="344" text-anchor="middle" class="sub">rates 10 randomized use cases per bundle</text>
+<path class="edge" d="M420,250 L470,300"/>
+<path class="edge" d="M690,260 L630,300"/>
 
-<rect x="400" y="380" width="200" height="60" class="box"/>
-<text x="500" y="405" text-anchor="middle" class="title">Domain intro</text>
-<text x="500" y="423" text-anchor="middle" class="sub">Creative: music, writing, art</text>
-<path class="edge" d="M500,350 L500,380"/>
+<path class="edge" d="M550,360 L550,390"/>
 
-<rect x="280" y="470" width="190" height="70" class="box"/>
-<text x="375" y="495" text-anchor="middle" class="title">Use case card</text>
-<text x="375" y="512" text-anchor="middle" class="sub">description shown first</text>
-<text x="375" y="527" text-anchor="middle" class="sub">(2 sentences max, jargon-free)</text>
-<path class="edge" d="M470,410 L375,470"/>
+<rect x="330" y="390" width="220" height="80" class="box"/>
+<text x="440" y="415" text-anchor="middle" class="title">Use case card</text>
+<text x="440" y="432" text-anchor="middle" class="sub">description shown if present</text>
+<text x="440" y="448" text-anchor="middle" class="sub">"no description yet" if absent</text>
+<text x="440" y="463" text-anchor="middle" class="sub" font-style="italic">no domain/subdomain shown to visitor</text>
 
-<rect x="530" y="470" width="190" height="70" class="box"/>
-<text x="625" y="495" text-anchor="middle" class="title">Rates use case</text>
-<text x="625" y="512" text-anchor="middle" class="sub">scale input (mechanic TBD)</text>
-<text x="625" y="527" text-anchor="middle" class="sub">progress bar advances</text>
-<path class="edge" d="M470,505 L530,505"/>
+<rect x="620" y="400" width="220" height="60" class="optional"/>
+<text x="730" y="425" text-anchor="middle" class="title">Requests explanation</text>
+<text x="730" y="442" text-anchor="middle" class="sub">flags for content team, non-blocking</text>
+<path class="edge" d="M550,430 L620,430"/>
+<text x="560" y="420" class="label">optional</text>
 
-<polygon points="500,580 590,620 500,660 410,620" class="decision"/>
-<text x="500" y="616" text-anchor="middle" class="title">More use</text>
-<text x="500" y="632" text-anchor="middle" class="sub">cases left?</text>
-<path class="edge" d="M580,540 L520,580"/>
+<path class="edge" d="M440,470 L440,500"/>
 
-<path class="edge" d="M430,610 C280,610 280,505 280,505" />
-<text x="200" y="600" class="label">yes to next card</text>
+<rect x="330" y="500" width="220" height="60" class="box"/>
+<text x="440" y="525" text-anchor="middle" class="title">Rates use case</text>
+<text x="440" y="542" text-anchor="middle" class="sub">mechanic/framing TBD, progress advances</text>
 
-<ellipse cx="740" cy="620" rx="110" ry="30" class="end"/>
-<text x="740" y="616" text-anchor="middle" class="title">Leaves mid-domain</text>
-<text x="740" y="632" text-anchor="middle" class="sub">no penalty, no save (v1)</text>
-<path class="edge" d="M600,510 C700,540 740,570 740,590" stroke-dasharray="4,3"/>
-<text x="700" y="560" class="label">closes / navigates away</text>
+<path class="edge" d="M440,560 L440,590"/>
 
-<ellipse cx="500" cy="740" rx="130" ry="34" class="end"/>
-<text x="500" y="736" text-anchor="middle" class="title">Domain ratings complete</text>
-<text x="500" y="753" text-anchor="middle" class="sub">to Results (Feature 2)</text>
-<path class="edge" d="M500,660 L500,706"/>
-<text x="530" y="685" class="label">no</text>
+<polygon points="440,590 540,630 440,670 340,630" class="decision"/>
+<text x="440" y="626" text-anchor="middle" class="title">Negative-pole</text>
+<text x="440" y="642" text-anchor="middle" class="sub">rating?</text>
+
+<rect x="620" y="600" width="240" height="60" class="optional"/>
+<text x="740" y="625" text-anchor="middle" class="title">Optional "why" field</text>
+<text x="740" y="642" text-anchor="middle" class="sub">free text, skippable, never required</text>
+<path class="edge" d="M540,625 L620,625"/>
+<text x="560" y="615" class="label">yes</text>
+
+<path class="edge" d="M440,670 L440,700"/>
+<text x="460" y="690" class="label">no</text>
+<path class="edge" d="M740,660 C740,700 550,700 440,700" />
+
+<polygon points="440,740 540,780 440,820 340,780" class="decision"/>
+<text x="440" y="776" text-anchor="middle" class="title">More use cases</text>
+<text x="440" y="792" text-anchor="middle" class="sub">left in bundle?</text>
+<path class="edge" d="M440,700 L440,740"/>
+
+<path class="edge" d="M340,775 C240,775 240,430 330,430" />
+<text x="150" y="600" class="label">yes, next card</text>
+<text x="150" y="614" class="label">in this bundle</text>
+
+<ellipse cx="820" cy="780" rx="120" ry="30" class="end"/>
+<text x="820" y="776" text-anchor="middle" class="title">Leaves mid-bundle</text>
+<text x="820" y="792" text-anchor="middle" class="sub">no penalty, no save (v1)</text>
+<path class="edge" d="M550,535 C700,590 820,690 820,750" stroke-dasharray="4,3"/>
+
+<path class="edge" d="M440,820 L440,880"/>
+<text x="470" y="850" class="label">no, bundle done</text>
+
+<polygon points="440,880 540,920 440,960 340,920" class="decision"/>
+<text x="440" y="916" text-anchor="middle" class="title">View results or</text>
+<text x="440" y="932" text-anchor="middle" class="sub">continue rating?</text>
+
+<path class="edge" d="M340,920 C110,920 110,430 330,430"/>
+<text x="20" y="660" class="label">continue: new</text>
+<text x="20" y="674" class="label">random bundle</text>
+
+<path class="edge" d="M440,960 L440,1000"/>
+<text x="470" y="990" class="label">view results</text>
+
+<ellipse cx="440" cy="1050" rx="170" ry="36" class="end"/>
+<text x="440" y="1045" text-anchor="middle" class="title">Bundle complete</text>
+<text x="440" y="1062" text-anchor="middle" class="sub">to Feature 2 — cumulative results</text>
+
+<rect x="60" y="1150" width="16" height="16" class="optional"/>
+<text x="86" y="1162" class="label">optional / non-blocking action</text>
+<text x="60" y="1190" class="sub">Scope: single randomized 10-use-case bundle, per prototype scope. Domains/subdomains organize data only, never shown to the visitor.</text>
 </svg>
