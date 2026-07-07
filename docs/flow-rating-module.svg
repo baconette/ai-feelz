@@ -1,6 +1,6 @@
-<svg viewBox="0 0 1100 1120" xmlns="http://www.w3.org/2000/svg" role="img">
-<title>Feature 1 user flow, updated for PRD v0.4 and bundle terminology</title>
-<desc>Restores the arrival-type decision (direct vs. shared link, each with its own landing screen) before start rating. Domain intro step removed; start rating notes 10-use-case bundles; adds optional description handling with a request-explanation action, and a conditional free-text "why" field shown only after a negative-pole rating.</desc>
+<svg viewBox="0 0 1100 1240" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Feature 1 user flow, updated for PRD v0.5 bundle model</title>
+<desc>Restores the arrival-type decision before start rating. Domain intro removed; visitor rates 10-use-case randomized bundles with no visible domain grouping. After each bundle, visitor chooses to view cumulative results or continue with another randomized bundle. Includes optional description handling, request-explanation action, and a conditional free-text "why" field on negative-pole ratings.</desc>
 <defs>
 <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
 <path d="M0,0 L10,5 L0,10 z" fill="#5F5E5A"/>
@@ -42,7 +42,7 @@
 
 <rect x="440" y="300" width="220" height="60" class="box"/>
 <text x="550" y="327" text-anchor="middle" class="title">Start rating</text>
-<text x="550" y="344" text-anchor="middle" class="sub">rates 10 use cases per bundle</text>
+<text x="550" y="344" text-anchor="middle" class="sub">rates 10 randomized use cases per bundle</text>
 <path class="edge" d="M420,250 L470,300"/>
 <path class="edge" d="M690,260 L630,300"/>
 
@@ -52,7 +52,7 @@
 <text x="440" y="415" text-anchor="middle" class="title">Use case card</text>
 <text x="440" y="432" text-anchor="middle" class="sub">description shown if present</text>
 <text x="440" y="448" text-anchor="middle" class="sub">"no description yet" if absent</text>
-<text x="440" y="463" text-anchor="middle" class="sub" font-style="italic">both states rateable now</text>
+<text x="440" y="463" text-anchor="middle" class="sub" font-style="italic">no domain/subdomain shown to visitor</text>
 
 <rect x="620" y="400" width="220" height="60" class="optional"/>
 <text x="730" y="425" text-anchor="middle" class="title">Requests explanation</text>
@@ -83,25 +83,38 @@
 <path class="edge" d="M740,660 C740,700 550,700 440,700" />
 
 <polygon points="440,740 540,780 440,820 340,780" class="decision"/>
-<text x="440" y="776" text-anchor="middle" class="title">More use</text>
-<text x="440" y="792" text-anchor="middle" class="sub">cases left?</text>
+<text x="440" y="776" text-anchor="middle" class="title">More use cases</text>
+<text x="440" y="792" text-anchor="middle" class="sub">left in bundle?</text>
 <path class="edge" d="M440,700 L440,740"/>
 
-<path class="edge" d="M340,775 C230,775 230,430 330,430" />
-<text x="160" y="610" class="label">yes, next card</text>
+<path class="edge" d="M340,775 C240,775 240,430 330,430" />
+<text x="150" y="600" class="label">yes, next card</text>
+<text x="150" y="614" class="label">in this bundle</text>
 
 <ellipse cx="820" cy="780" rx="120" ry="30" class="end"/>
 <text x="820" y="776" text-anchor="middle" class="title">Leaves mid-bundle</text>
 <text x="820" y="792" text-anchor="middle" class="sub">no penalty, no save (v1)</text>
 <path class="edge" d="M550,535 C700,590 820,690 820,750" stroke-dasharray="4,3"/>
 
-<ellipse cx="440" cy="900" rx="150" ry="34" class="end"/>
-<text x="440" y="896" text-anchor="middle" class="title">Domain ratings complete</text>
-<text x="440" y="913" text-anchor="middle" class="sub">to Feature 2 — Results</text>
-<path class="edge" d="M440,820 L440,866"/>
-<text x="470" y="845" class="label">no</text>
+<path class="edge" d="M440,820 L440,880"/>
+<text x="470" y="850" class="label">no, bundle done</text>
 
-<rect x="60" y="1000" width="16" height="16" class="optional"/>
-<text x="86" y="1012" class="label">optional / non-blocking action</text>
-<text x="60" y="1040" class="sub">Scope: Creative or Healthcare domain, single subdomain, per prototype scope.</text>
+<polygon points="440,880 540,920 440,960 340,920" class="decision"/>
+<text x="440" y="916" text-anchor="middle" class="title">View results or</text>
+<text x="440" y="932" text-anchor="middle" class="sub">continue rating?</text>
+
+<path class="edge" d="M340,920 C110,920 110,430 330,430"/>
+<text x="20" y="660" class="label">continue: new</text>
+<text x="20" y="674" class="label">random bundle</text>
+
+<path class="edge" d="M440,960 L440,1000"/>
+<text x="470" y="990" class="label">view results</text>
+
+<ellipse cx="440" cy="1050" rx="170" ry="36" class="end"/>
+<text x="440" y="1045" text-anchor="middle" class="title">Bundle complete</text>
+<text x="440" y="1062" text-anchor="middle" class="sub">to Feature 2 — cumulative results</text>
+
+<rect x="60" y="1150" width="16" height="16" class="optional"/>
+<text x="86" y="1162" class="label">optional / non-blocking action</text>
+<text x="60" y="1190" class="sub">Scope: single randomized 10-use-case bundle, per prototype scope. Domains/subdomains organize data only, never shown to the visitor.</text>
 </svg>

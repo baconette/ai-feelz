@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wireframe: Use case card — 3 states (PRD v0.4)</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; color: #2C2C2A; background: #F1EFE8; margin: 0; padding: 2rem; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  p.meta { font-size: 13px; color: #5F5E5A; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; font-size: 13px; }
+  th, td { border: 1px solid #D3D1C7; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #E6E4DB; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 1.5rem; }
+  .card { background: #FFFFFF; border: 1px solid #D3D1C7; border-radius: 12px; padding: 1rem 1.25rem; }
+  .card-label { font-size: 12px; color: #888780; margin-bottom: 8px; }
+  .progress { height: 4px; background: #F1EFE8; border-radius: 2px; margin-bottom: 14px; }
+  .progress-fill { width: 33%; height: 100%; background: #888780; border-radius: 2px; }
+  .line { height: 10px; background: #F1EFE8; border-radius: 4px; margin-bottom: 6px; }
+  .placeholder { border: 1px dashed #D3D1C7; border-radius: 8px; padding: 10px; margin-bottom: 12px; text-align: center; }
+  .placeholder span { font-size: 12px; color: #888780; font-style: italic; }
+  input[type=range] { width: 100%; margin-bottom: 4px; }
+  .scale-labels { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 10px; color: #888780; }
+  .why-block { border-top: 1px solid #D3D1C7; padding-top: 10px; margin-bottom: 10px; }
+  .why-block label { font-size: 12px; color: #5F5E5A; display: block; margin-bottom: 6px; }
+  textarea { width: 100%; font-size: 12px; box-sizing: border-box; }
+  .row { display: flex; justify-content: space-between; align-items: center; }
+  .link { font-size: 11px; text-decoration: underline; cursor: pointer; color: #5F5E5A; }
+  .link.accent { color: #185FA5; }
+  button { font-size: 12px; padding: 6px 12px; border: 1px solid #888780; background: #FFFFFF; border-radius: 6px; }
+  .note { font-size: 11px; color: #888780; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Wireframe: use case rating card — 3 states</h1>
+  <p class="meta">Feature 1, AI Use Case Rating Module — reflects PRD v0.4 (optional descriptions, request-explanation action, conditional negative-rating free-text field). Base rating input shown here is the 5-step snapping slider; the 4 mechanic variants from Round 1 are interchangeable with this card chrome.</p>
+
+  <table>
+    <tr><th>State</th><th>What changes</th><th>Behavior notes</th></tr>
+    <tr>
+      <td><strong>A — has description</strong></td>
+      <td>Standard layout: description text, rating input, low-emphasis "Request an explanation" link</td>
+      <td>The request-explanation affordance is present on every card, not just missing-description ones, per PRD acceptance criteria ("whether or not it currently has one"). Styled as underlined text, not a button, so it doesn't compete with the rating action for attention.</td>
+    </tr>
+    <tr>
+      <td><strong>B — no description yet</strong></td>
+      <td>A dashed-border placeholder replaces the description block; explicitly says "rate based on the name above"</td>
+      <td>Card is fully rateable in this state — this is the PRD's explicit requirement, not a soft degradation. The request-explanation link gets slightly more visual weight here (accent color) since it's the only path to more context, but still isn't a blocking modal or required step.</td>
+    </tr>
+    <tr>
+      <td><strong>C — negative rating selected</strong></td>
+      <td>An inline free-text box appears below the rating input, with a "Skip" action alongside advance</td>
+      <td>Triggers only on negative-pole selection. "Skip" and leaving it blank are functionally identical — no validation forces engagement. The request-explanation link stays available even in this state.</td>
+    </tr>
+  </table>
+
+  <p class="meta"><strong>Cross-cutting annotations:</strong> State C's free-text field should animate in (not jump-cut), since it appears after an action the visitor already completed. The request-explanation link needs real button/role="button" semantics despite link-like styling, since it triggers an action (queues a flag) rather than navigating. Description presence/absence and the negative-pole threshold are both data-driven per use case, from the Notion-sourced dataset — not hardcoded per domain.</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-label">State A — has description</div>
+      <div class="progress"><div class="progress-fill"></div></div>
+      <div class="line" style="width:70%;"></div>
+      <div class="line" style="width:90%;"></div>
+      <div class="line" style="width:50%; margin-bottom:12px;"></div>
+      <input type="range" min="1" max="5" step="1" value="3">
+      <div class="scale-labels"><span>Uneasy</span><span>Enthusiastic</span></div>
+      <div class="row" style="justify-content:flex-end;">
+        <span class="link">Something unclear? Request an explanation</span>
+      </div>
+      <div class="note">Link-style, low emphasis — not a button. Always present.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">State B — no description yet</div>
+      <div class="progress"><div class="progress-fill"></div></div>
+      <div class="placeholder"><span>No description yet for this one — rate based on the name above.</span></div>
+      <input type="range" min="1" max="5" step="1" value="3">
+      <div class="scale-labels"><span>Uneasy</span><span>Enthusiastic</span></div>
+      <div class="row" style="justify-content:flex-end;">
+        <span class="link accent">Request an explanation</span>
+      </div>
+      <div class="note">Same affordance, more prominent copy since there's nothing else to read. Card is still fully rateable — never blocks.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">State C — negative rating selected</div>
+      <div class="progress"><div class="progress-fill"></div></div>
+      <div class="line" style="width:70%;"></div>
+      <div class="line" style="width:90%;"></div>
+      <div class="line" style="width:50%; margin-bottom:12px;"></div>
+      <input type="range" min="1" max="5" step="1" value="1">
+      <div class="scale-labels"><span style="color:#A32D2D; font-weight:600;">Uneasy</span><span>Enthusiastic</span></div>
+      <div class="why-block">
+        <label>Want to say why? (optional)</label>
+        <textarea rows="2" placeholder="Type your thoughts..."></textarea>
+      </div>
+      <div class="row">
+        <span class="link">Request an explanation</span>
+        <button>Skip →</button>
+      </div>
+      <div class="note">Appears only after a negative-pole selection. Never required — "Skip" and blank submit are equivalent.</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

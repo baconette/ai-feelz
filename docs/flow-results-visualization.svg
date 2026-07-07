@@ -31,7 +31,7 @@
 
 <rect x="320" y="120" width="240" height="70" class="box"/>
 <text x="440" y="148" text-anchor="middle" class="title">Results visualization</text>
-<text x="440" y="165" text-anchor="middle" class="sub">legible with no caption copy</text>
+<text x="440" y="165" text-anchor="middle" class="sub">reflects cumulative bundles rated</text>
 <text x="440" y="180" text-anchor="middle" class="sub">visual form: open question</text>
 
 <path class="edge" d="M440,190 L440,230"/>
@@ -51,5 +51,5 @@
 
 <rect x="60" y="480" width="16" height="16" class="system"/>
 <text x="86" y="492" class="label">system process</text>
-<text x="60" y="530" class="sub">Not shown: per-bundle snapshot vs. full-profile branching — PRD says results appear "for a domain (or all domains)" but doesn't yet specify how that choice surfaces to the visitor. Flag as an open question for this feature.</text>
+<text x="60" y="530" class="sub">Resolved: results always reflect cumulative ratings across every bundle completed so far, not a per-bundle snapshot. Visitor reaches this screen after each bundle by choosing "view results" over "continue rating" (see Feature 1 flow).</text>
 </svg>

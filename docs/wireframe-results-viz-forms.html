@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wireframe: Results visualization — 4 candidate forms (Feature 2)</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; color: #2C2C2A; background: #F1EFE8; margin: 0; padding: 2rem; }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+  p.meta { font-size: 13px; color: #5F5E5A; margin-top: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; font-size: 13px; }
+  th, td { border: 1px solid #D3D1C7; padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: #E6E4DB; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 1.5rem; }
+  .card { background: #FFFFFF; border: 1px solid #D3D1C7; border-radius: 12px; padding: 1rem 1.25rem; }
+  .card-label { font-size: 12px; color: #888780; margin-bottom: 8px; }
+  .note { font-size: 11px; color: #888780; margin-top: 8px; }
+  .link { font-size: 11px; text-decoration: underline; cursor: pointer; color: #185FA5; }
+  .bar-row { margin-bottom: 8px; }
+  .bar-label { font-size: 11px; color: #5F5E5A; margin-bottom: 2px; }
+  .bar-track { height: 10px; background: #F1EFE8; border-radius: 4px; }
+  .bar-fill { height: 100%; background: #888780; border-radius: 4px; }
+  .archetype-icon { width: 56px; height: 56px; border-radius: 50%; background: #F1EFE8; margin: 0 auto 12px; }
+  .center { text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Wireframe: individual results visualization — 4 candidate forms</h1>
+  <p class="meta">Feature 2 — all four use the same synthetic respondent profile so the comparison isolates form legibility, not data: Healthcare 4/5, Finances 2/5, Home &amp; Personal Life 3.5/5, Media &amp; Culture 5/5 (uneasy&harr;enthusiastic axis placeholder).</p>
+
+  <table>
+    <tr><th>Form</th><th>Static content</th><th>Data-driven</th><th>Where "see individual use case" lives</th></tr>
+    <tr>
+      <td><strong>1 — Radar / spider</strong></td>
+      <td>Axis labels, grid rings</td>
+      <td>Shape/vertex positions per domain score</td>
+      <td>Tap a vertex → expands that domain's use-case list. Satisfies the acceptance criterion, but adds a required interaction most visitors may not discover unprompted.</td>
+    </tr>
+    <tr>
+      <td><strong>2 — Spectrum / dial</strong></td>
+      <td>Axis end-labels ("Uneasy"/"Enthusiastic")</td>
+      <td>Needle position, one-line lean label</td>
+      <td>Entirely on-demand via "See domain breakdown," then use-case detail nested a level deeper still. Most glanceable, but pushes the most content behind taps.</td>
+    </tr>
+    <tr>
+      <td><strong>3 — Archetype card</strong></td>
+      <td>Icon/avatar shape</td>
+      <td>Headline archetype + one-line summary, both generated from the data</td>
+      <td>Fully on-demand via "See how you rated each domain." Most likely to feel "expressive" per the PRD's language, at the cost of being the most subjective to get right editorially.</td>
+    </tr>
+    <tr>
+      <td><strong>4 — Bar chart per subdomain</strong></td>
+      <td>Bar track backgrounds</td>
+      <td>Every bar's length and label</td>
+      <td>Already inline — no tap needed. Flagged risk: this sample shows 4 bars; at full scale (up to 103 use cases) this form likely fails "no additional explanation copy" and "at a glance" outright.</td>
+    </tr>
+  </table>
+
+  <p class="meta"><strong>Cross-cutting annotations:</strong> none of the four should show a loading spinner — all render from data already computed during the rating session, satisfying the &lt;2s requirement structurally. Forms 1 and 2 (SVG-based) need explicit mobile scaling checks — radar charts compress badly under 320px width; Form 4 needs horizontal scroll or truncated labels at that width. Accessibility flag for later: none of these are screen-reader-legible as drawn — production build needs a text-equivalent data table alongside the visual, not just alt text on the chart.</p>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-label">Form 1 — radar / spider chart</div>
+      <svg viewBox="0 0 300 260" style="width:100%; height:auto;">
+        <polygon points="150,50 250,150 150,250 50,150" fill="none" stroke="#D3D1C7" stroke-width="1"/>
+        <polygon points="150,83 217,150 150,217 83,150" fill="none" stroke="#D3D1C7" stroke-width="1"/>
+        <polygon points="150,117 183,150 150,183 117,150" fill="none" stroke="#D3D1C7" stroke-width="1"/>
+        <line x1="150" y1="150" x2="150" y2="50" stroke="#D3D1C7" stroke-width="1"/>
+        <line x1="150" y1="150" x2="250" y2="150" stroke="#D3D1C7" stroke-width="1"/>
+        <line x1="150" y1="150" x2="150" y2="250" stroke="#D3D1C7" stroke-width="1"/>
+        <line x1="150" y1="150" x2="50" y2="150" stroke="#D3D1C7" stroke-width="1"/>
+        <polygon points="150,70 190,150 150,220 50,150" fill="#5F5E5A" fill-opacity="0.15" stroke="#2C2C2A" stroke-width="2"/>
+        <circle cx="150" cy="70" r="3" fill="#2C2C2A"/>
+        <circle cx="190" cy="150" r="3" fill="#2C2C2A"/>
+        <circle cx="150" cy="220" r="3" fill="#2C2C2A"/>
+        <circle cx="50" cy="150" r="3" fill="#2C2C2A"/>
+        <text x="150" y="35" text-anchor="middle" font-size="11" fill="#5F5E5A">Healthcare</text>
+        <text x="270" y="153" text-anchor="start" font-size="11" fill="#5F5E5A">Finances</text>
+        <text x="150" y="243" text-anchor="middle" font-size="11" fill="#5F5E5A">Home &amp; Personal</text>
+        <text x="30" y="153" text-anchor="end" font-size="11" fill="#5F5E5A">Media &amp; Culture</text>
+      </svg>
+      <div class="note">Tap a vertex to expand that domain's individual use-case ratings.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Form 2 — spectrum / dial</div>
+      <svg viewBox="0 0 300 170" style="width:100%; height:auto;">
+        <path d="M 40 150 A 110 110 0 0 1 260 150" fill="none" stroke="#D3D1C7" stroke-width="10"/>
+        <line x1="150" y1="150" x2="205" y2="62" stroke="#2C2C2A" stroke-width="3"/>
+        <circle cx="150" cy="150" r="6" fill="#2C2C2A"/>
+        <text x="40" y="168" font-size="10" fill="#888780">Uneasy</text>
+        <text x="230" y="168" font-size="10" fill="#888780" text-anchor="end">Enthusiastic</text>
+      </svg>
+      <div class="center" style="font-size:13px; font-weight:600; margin-top:4px;">Leaning enthusiastic</div>
+      <div class="center" style="margin-top:10px;"><span class="link">See domain breakdown</span></div>
+      <div class="note">Single glance = overall lean only. Domain and individual use-case detail live behind the tap.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Form 3 — archetype card</div>
+      <div class="center" style="padding:1rem 0;">
+        <div class="archetype-icon"></div>
+        <div style="font-size:18px; font-weight:600;">The curious optimist</div>
+        <div style="font-size:13px; color:#5F5E5A; margin-top:6px; max-width:80%; margin-left:auto; margin-right:auto;">You lean enthusiastic across most domains, with more caution around finances.</div>
+      </div>
+      <div class="center" style="margin-top:8px;"><span class="link">See how you rated each domain</span></div>
+      <div class="note">Headline + one-line summary are the only static-priority content; all rating detail is on demand.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Form 4 — bar chart per subdomain</div>
+      <div class="bar-row">
+        <div class="bar-label">Healthcare &gt; Diagnostics</div>
+        <div class="bar-track"><div class="bar-fill" style="width:80%;"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Healthcare &gt; Mental health</div>
+        <div class="bar-track"><div class="bar-fill" style="width:60%;"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Media &amp; Culture &gt; Music</div>
+        <div class="bar-track"><div class="bar-fill" style="width:100%;"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Media &amp; Culture &gt; Writing</div>
+        <div class="bar-track"><div class="bar-fill" style="width:80%;"></div></div>
+      </div>
+      <div class="note">Individual use-case rating is already inline here — no on-demand affordance needed, but this is the densest form and may fail the "at a glance" test with all 103 use cases.</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
