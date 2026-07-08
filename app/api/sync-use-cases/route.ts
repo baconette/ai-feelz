@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { fetchPublishedUseCases } from '@/lib/notion/client'
+import { fetchDomains, fetchPublishedUseCases } from '@/lib/notion/client'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
@@ -10,12 +10,46 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const useCases = await fetchPublishedUseCases()
   const supabase = createAdminClient()
+
+  const domains = await fetchDomains()
+  const domainRows = domains.map((d) => ({
+    notion_id: d.notionId,
+    name: d.name,
+    description: d.description,
+    image_url: d.imageUrl,
+    updated_at: new Date().toISOString(),
+  }))
+
+  if (domainRows.length > 0) {
+    const { error: domainUpsertError } = await supabase
+      .from('domains')
+      .upsert(domainRows, { onConflict: 'notion_id' })
+
+    if (domainUpsertError) {
+      return NextResponse.json({ error: domainUpsertError.message }, { status: 500 })
+    }
+  }
+
+  const domainDeleteQuery = supabase.from('domains').delete()
+  const { error: domainDeleteError } =
+    domainRows.length > 0
+      ? await domainDeleteQuery.not(
+          'notion_id',
+          'in',
+          `(${domainRows.map((d) => `"${d.notion_id}"`).join(',')})`
+        )
+      : await domainDeleteQuery.neq('notion_id', '')
+
+  if (domainDeleteError) {
+    return NextResponse.json({ error: domainDeleteError.message }, { status: 500 })
+  }
+
+  const useCases = await fetchPublishedUseCases()
 
   const rows = useCases.map((uc) => ({
     notion_id: uc.notionId,
-    domain: uc.domain,
+    domain_id: uc.domainId,
     subdomain: uc.subdomain,
     use_case: uc.useCase,
     alias: uc.alias,
@@ -52,5 +86,5 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: deleteError.message }, { status: 500 })
   }
 
-  return NextResponse.json({ synced: rows.length })
+  return NextResponse.json({ synced: rows.length, domainsSynced: domainRows.length })
 }
