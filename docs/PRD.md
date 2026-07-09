@@ -67,8 +67,8 @@ As AI tooling becomes more prevalent across creative, professional, and personal
 - Each use case may include a short, plain-language description (≤2 sentences) — descriptions are optional per use case; when present, they require no assumed AI knowledge to understand.
 - If a use case has no description, or a visitor doesn't understand it as written, the visitor can request that an explanation/description be added to it. This is a lightweight flag/request action, not a live AI-generated explanation — requests are queued for the content team to address.
 - If a visitor rates a use case as **should not exist**, **uneasy**, or **distrust** (whichever negative pole applies under the selected rating axis, see Open Questions #1), they are offered an optional free-text field to explain why they chose that rating. This field is never required and only appears after one of these specific negative ratings is selected — it is not shown for neutral or positive ratings.
-- Although use cases are organized into domains and subdomains at the data layer, the visitor may or may not them grouped or labeled that way. The visitor is served **10 randomized use cases per bundle**, drawn without regard to domain or subdomain, so the rating experience feels like a continuous stream rather than a category-by-category survey. After completing a 10-use-case bundle, the visitor chooses whether to continue with another randomized bundle or stop. Domains and subdomains remain the organizing structure for content management, the Supabase schema, and analytics — not for the visitor-facing rating flow.
-- After finishing each 10-use-case bundle, the visitor can view their results visualization (see Requirement 2) before deciding whether to continue rating another bundle. Results reflect all bundles completed so far, not just the most recent one.
+- Although use cases are organized into domains and subdomains at the data layer, the visitor may or may not them grouped or labeled that way. The visitor is served **7 randomized use cases per bundle**, drawn without regard to domain or subdomain, so the rating experience feels like a continuous stream rather than a category-by-category survey. After completing a 7-use-case bundle, the visitor chooses whether to continue with another randomized bundle or stop. Domains and subdomains remain the organizing structure for content management, the Supabase schema, and analytics — not for the visitor-facing rating flow.
+- After finishing each 7-use-case bundle, the visitor can view their results visualization (see Requirement 2) before deciding whether to continue rating another bundle. Results reflect all bundles completed so far, not just the most recent one.
 - Acceptance criteria:
   - [ ] A visitor can complete all ratings in a single session without account creation
   - [ ] Each use case is presented with its description visible before rating, when a description exists for that use case
@@ -77,14 +77,14 @@ As AI tooling becomes more prevalent across creative, professional, and personal
   - [ ] A visitor who rates a use case as should not exist, uneasy, or distrust is shown an optional free-text field asking why
   - [ ] The optional free-text field does not appear for any other rating value
   - [ ] The interaction is touch and mouse compatible
-  - [ ] Use cases are served in randomized bundles of 10, drawn across domains and subdomains without visible grouping or labeling
-  - [ ] Progress is visible so visitors know how far along they are within the current 10-use-case bundle
+  - [ ] Use cases are served in randomized bundles of 7, drawn across domains and subdomains without visible grouping or labeling
+  - [ ] Progress is visible so visitors know how far along they are within the current 7-use-case bundle
   - [ ] After completing a bundle, the visitor is presented with a clear choice to view results or continue to another bundle
   - [ ] The results visualization reflects the visitor's cumulative ratings across all bundles completed so far
   - [ ] New domains and subdomains can be added to the underlying data without breaking existing use cases or visitor flows
 
 **2. Individual Results Visualization**
-- Upon completing a 10-use-case bundle (or choosing to stop after any bundle), the visitor sees a personalized visualization of their results, reflecting all ratings submitted so far.
+- Upon completing a 7-use-case bundle (or choosing to stop after any bundle), the visitor sees a personalized visualization of their results, reflecting all ratings submitted so far.
 - The visualization must make the visitor's overall "AI attitude profile" legible at a glance — not just a list of scores.
 - Visualization type is a **design team action item**, to be decided after rating scale and domain list are confirmed (see Open Questions #2).
 - Acceptance criteria:
