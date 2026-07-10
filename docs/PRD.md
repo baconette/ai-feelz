@@ -92,11 +92,13 @@ As AI tooling becomes more prevalent across creative, professional, and personal
   - [ ] The visualization is readable without any additional explanation copy
   - [ ] The visitor can see their rating for each individual use case within the visualization or on demand
 
-**3. Aggregate / Comparison Visualization**
-- After viewing individual results, visitors can see how their ratings compare to the aggregate of all previous visitors.
+**3. Comparison Visualization**
+- After viewing individual results:
+  - Visitors can see how their ratings compare to the friend that shared the link with them (default view)
+  - Visitors can see how their ratings compare to an aggregate of all previous visitors.
 - All ratings are stored anonymously server-side in **Supabase**. This is the confirmed architecture — no PII is collected or stored.
 - Aggregate data updates in real time (or near-real time) as new visitors complete the experience.
-- A minimum response threshold of 10 must be met before aggregate data is surfaced, to ensure social proof is meaningful rather than misleading. **Exact threshold is a design team action item** (see Open Questions #4).
+- A minimum response threshold of 25 respondents must be met before aggregate data is surfaced, to ensure social proof is meaningful rather than misleading. **Exact threshold is a design team action item** (see Open Questions #4).
 - The Supabase schema must treat domains and use cases as configurable records, not hardcoded structures. This ensures new domains can be added at the data layer without schema migrations or breaking changes to existing domain data.
 - Acceptance criteria:
   - [ ] Anonymous ratings are written to Supabase on submission
@@ -108,6 +110,7 @@ As AI tooling becomes more prevalent across creative, professional, and personal
 **4. Shareable Results Artifact**
 - Visitors can share their individual results as a unique URL.
 - The shared URL encodes or retrieves the visitor's result profile and prompts the viewer to take the experience themselves.
+- The shared encoded URL is used to compare a new visitor's results with the results from the encoded URL that led them to the app.
 - The shared artifact must be visually self-contained and interpretable without context.
 - Acceptance criteria:
   - [ ] A "Share" or "Copy link" action is available on the results screen
@@ -192,7 +195,7 @@ As AI tooling becomes more prevalent across creative, professional, and personal
 | Question | Owner | Status | Notes |
 |---|---|---|---|
 | **Rating scale / narrative framing**: Which axis (or axes) will visitors rate on? Options: (a) human ↔ AI, (b) uneasy ↔ enthusiastic, (c) should exist ↔ should not exist, (d) replaces ↔ augments, (e) trust ↔ distrust. Shapes data model and all visualizations. | **Design** | 🔴 Action item — blocks data model | E&C will prototyped 2, 3, 5 range input designs · Don't want AI to do this, Do want AI to do this · Will polish axes names later · Or how could answers generate axes relevant to user? |
-| **Individual results viz type**: What visual form best represents an individual's AI attitude profile? To be decided after rating scale and domain list are confirmed. | **Design** | 🔴 Action item — blocks front-end build | |
+| **Individual results viz type**: What visual form best represents an individual's AI attitude profile? To be decided after rating scale and domain list are confirmed. | **Design** | 🔴 Action item — blocks front-end build | Come up with categories for people to be classified into based on their answers and categories · Compare with friend based on the link they shared |
 | **Use case list per domain**: What are the specific use cases within each domain? Should any be intentionally provocative to create differentiation in responses? | **Design + Content** | 🔴 Action item — blocks rating module per epic | |
 | **Aggregate minimum threshold**: How many responses before aggregate data is shown? What placeholder state is shown before the threshold is met? | **Design + Engineering** | 🔴 Action item — blocks aggregate view | |
 | **Anchoring bias mitigation**: Aggregate shown after individual results only, or offer a toggle? What if the visitor wants to see aggregate *while* rating? | **Design** | 🟡 Non-blocking — affects UX flow | |
