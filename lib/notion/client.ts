@@ -97,6 +97,36 @@ export async function fetchPublishedUseCases(): Promise<NotionUseCase[]> {
   return useCases
 }
 
+/**
+ * Fetches every row from the AI-use-cases Notion data source regardless of Published status.
+ * Intended for internal prototypes that need realistic content volume ahead of the
+ * publishing workflow being caught up — do not use this for visitor-facing production surfaces.
+ */
+export async function fetchAllUseCases(): Promise<NotionUseCase[]> {
+  const notion = getNotionClient()
+  const dataSourceId = process.env.NOTION_USE_CASES_DATA_SOURCE_ID!
+
+  const useCases: NotionUseCase[] = []
+  let cursor: string | undefined
+
+  do {
+    const response: QueryDataSourceResponse = await notion.dataSources.query({
+      data_source_id: dataSourceId,
+      start_cursor: cursor,
+    })
+
+    for (const page of response.results) {
+      if ('properties' in page) {
+        useCases.push(toUseCase(page as PageObjectResponse))
+      }
+    }
+
+    cursor = response.has_more ? response.next_cursor ?? undefined : undefined
+  } while (cursor)
+
+  return useCases
+}
+
 /** Fetches every row from the Notion Domains data source. */
 export async function fetchDomains(): Promise<NotionDomain[]> {
   const notion = getNotionClient()
