@@ -1,11 +1,11 @@
 /**
  * Seeded fake "everyone else" dataset for the prototype's aggregate comparison view.
- * Not real data — there aren't 10+ real respondents yet. Replace with a real
+ * Not real data — there aren't 25+ real respondents yet. Replace with a real
  * aggregate query once ratings actually persist somewhere.
  */
 
 export const MOCK_RESPONDENT_COUNT = 128
-export const MOCK_RESPONSE_THRESHOLD = 10
+export const MOCK_RESPONSE_THRESHOLD = 25
 
 const MOCK_DOMAIN_AVERAGES: Record<string, number> = {
   Healthcare: 2.3,
