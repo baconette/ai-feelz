@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export type CompareTab = 'friend' | 'others'
 
@@ -12,23 +12,11 @@ export function CompareTabs({
   onChange: (tab: CompareTab) => void
 }) {
   return (
-    <div className="mb-3 flex gap-2">
-      <Button
-        type="button"
-        size="sm"
-        variant={active === 'friend' ? 'default' : 'neutral'}
-        onClick={() => onChange('friend')}
-      >
-        My Friend
-      </Button>
-      <Button
-        type="button"
-        size="sm"
-        variant={active === 'others' ? 'default' : 'neutral'}
-        onClick={() => onChange('others')}
-      >
-        Others
-      </Button>
-    </div>
+    <Tabs value={active} onValueChange={(value) => onChange(value as CompareTab)} className="mb-3 w-fit mx-auto">
+      <TabsList>
+        <TabsTrigger value="friend">My Friend</TabsTrigger>
+        <TabsTrigger value="others">Others</TabsTrigger>
+      </TabsList>
+    </Tabs>
   )
 }
