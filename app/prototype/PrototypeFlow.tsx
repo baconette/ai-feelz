@@ -140,24 +140,7 @@ export function PrototypeFlow({
         </div>
       )}
 
-      {shareOpen && (
-        <div
-          className="fixed inset-0 z-10 flex items-center justify-center bg-overlay p-4"
-          onClick={() => setShareOpen(false)}
-        >
-          <div className="relative w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setShareOpen(false)}
-              aria-label="Close"
-              className="absolute -top-3 -right-3 flex h-7 w-7 items-center justify-center rounded-full border-2 border-border bg-secondary-background text-sm font-base text-foreground shadow-shadow"
-            >
-              ×
-            </button>
-            <ShareScreen onRestart={reset} />
-          </div>
-        </div>
-      )}
+      {shareOpen && <ShareScreen onClose={() => setShareOpen(false)} onRestart={reset} />}
 
       <p className="mt-8 text-center text-xs font-base text-muted-foreground">
         {completedBundles} round{completedBundles === 1 ? '' : 's'} complete · neobrutalist prototype
