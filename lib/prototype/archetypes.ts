@@ -43,6 +43,15 @@ function pickTier(average: number) {
   return TIERS.find((tier) => average <= tier.max) ?? TIERS[TIERS.length - 1]
 }
 
+/**
+ * A domain needs at least this many ratings before it counts toward the archetype
+ * or appears in the domain breakdown — otherwise a single noisy rating (the common
+ * case, since a 7-card bundle rarely touches the same domain twice) would stand in
+ * for a whole domain. Decided in the archetype-logic design sprint, see
+ * docs/sprint-archetype-logic.md.
+ */
+export const MIN_RATINGS_PER_DOMAIN = 2
+
 export function computeArchetype(
   ratings: RatingsMap,
   useCases: NotionUseCase[],
@@ -50,15 +59,15 @@ export function computeArchetype(
 ): ArchetypeResult {
   const domainNameById = new Map(domains.map((d) => [d.notionId, d.name]))
   const byDomain = new Map<string, { sum: number; count: number }>()
-  let sum = 0
-  let count = 0
+  let rawSum = 0
+  let ratingCount = 0
 
   for (const useCase of useCases) {
     const rating = ratings[useCase.notionId]
     if (!rating) continue
 
-    sum += rating.value
-    count += 1
+    rawSum += rating.value
+    ratingCount += 1
 
     const domainKey = useCase.domainId ?? 'unknown'
     const entry = byDomain.get(domainKey) ?? { sum: 0, count: 0 }
@@ -67,10 +76,8 @@ export function computeArchetype(
     byDomain.set(domainKey, entry)
   }
 
-  const overallAverage = count > 0 ? sum / count : 0
-  const tier = pickTier(overallAverage)
-
   const domainScores: DomainScore[] = Array.from(byDomain.entries())
+    .filter(([, { count }]) => count >= MIN_RATINGS_PER_DOMAIN)
     .map(([domainId, { sum: domainSum, count: domainCount }]) => ({
       domainId,
       domainName: domainNameById.get(domainId) ?? 'Other',
@@ -79,11 +86,25 @@ export function computeArchetype(
     }))
     .sort((a, b) => b.average - a.average)
 
+  // Equal-domain-weight: average the domain averages, not the raw ratings, so a
+  // domain the random bundle happened to serve more often doesn't dominate the
+  // score. Falls back to the raw per-rating average when no domain has reached
+  // the confidence threshold yet, since the archetype is always shown at full
+  // confidence regardless of sample size (also a design-sprint decision).
+  const overallAverage =
+    domainScores.length > 0
+      ? domainScores.reduce((sum, d) => sum + d.average, 0) / domainScores.length
+      : ratingCount > 0
+        ? rawSum / ratingCount
+        : 0
+
+  const tier = pickTier(overallAverage)
+
   return {
     headline: tier.headline,
     summary: tier.summary,
     overallAverage,
-    ratingCount: count,
+    ratingCount,
     domainScores,
   }
 }
