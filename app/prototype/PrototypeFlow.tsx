@@ -117,7 +117,7 @@ export function PrototypeFlow({
           index={bundleIndex + 1}
           total={bundle.length}
           onSubmit={handleRatingSubmit}
-          onRequestExplanation={() => showAck("Thanks — we'll add more context here.")}
+          onRequestExplanation={() => showAck("Flagged for the content team — thanks!")}
         />
       )}
 
