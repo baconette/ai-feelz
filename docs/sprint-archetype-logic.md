@@ -80,3 +80,66 @@ Content shape driving this sprint's constraints: ~10 domains, ~40+ subdomains, 1
 | Day 3 | Mid-sprint check-in — review candidate scoring approaches |
 | Day 5 | Sprint end / demo — walk through synthetic test cases + finalized archetype list |
 | Day 5 (or next Monday) | Retro |
+
+---
+
+## Progress Log
+
+### P0 — Done, shipped to the prototype
+
+Decided together and implemented in `lib/prototype/archetypes.ts` (merged via [PR #16](https://github.com/baconette/ai-feelz/pull/16)):
+
+- **Confidence model**: a domain needs ≥2 ratings before it counts toward the archetype or shows in the domain breakdown (`MIN_RATINGS_PER_DOMAIN`). Single-rating noise is filtered out.
+- **Sparse-data UX**: no change from original behavior — the archetype always shows at full confidence regardless of sample size. No "provisional" tag, no withholding.
+- **Domain weighting**: equal-domain-weight. The overall score averages each domain's average together, rather than pooling every individual rating — so a domain the random bundle happened to serve more often doesn't quietly dominate the score. Falls back to the raw per-rating average until any domain crosses the confidence threshold.
+
+### P1 — Content brainstorm: expanded archetype set (drafted, not yet implemented)
+
+Decided to build the expanded set around a **2-axis model**: the existing 4-tier average (level) crossed with a new **polarization** axis (steady vs. polarized), for exactly 8 archetypes — landing right at the sprint's 6–8 cap. Names stay as originally proposed (not revisited).
+
+| Level | Archetype | Variant | Triggers when... | Summary copy |
+|---|---|---|---|---|
+| Skeptical (≤1.75) | The Skeptical Observer | Steady | Default — your ratings consistently cluster low, no notable exceptions. | "You'd rather a human handled most of this — AI hasn't earned much trust from you yet." |
+| Skeptical (≤1.75) | The Selective Skeptic | Polarized | Your ratings are mostly Never/Rarely, but you gave a real handful of use cases Often or Always. | "You're wary of AI almost everywhere — except the handful of places you've decided it's earned your trust." |
+| Cautious (1.76–2.5) | The Cautious Pragmatist | Steady | Default — your ratings consistently sit in the guarded-but-open middle, no notable extremes. | "You're wary of AI by default, but not opposed — you just want a clear reason before you hand something over." |
+| Cautious (1.76–2.5) | The Selective Realist | Polarized | Your average lands in the middle, but only because your ratings genuinely span both extremes and cancel out. | "You're not moderate, you're mixed — fully on board in some places, hard no in others, and it averages out to 'it depends.'" |
+| Curious (2.51–3.25) | The Curious Adopter | Steady | Default — your ratings consistently sit in the warm-but-not-sold middle, no notable extremes. | "You're warm to AI without being sold on it — moderately open, pretty even about it, no strong swings either way." |
+| Curious (2.51–3.25) | The Selective Enthusiast | Polarized | Your average is fairly positive, but a meaningful chunk of your ratings are flat-out Never in specific areas. | "You don't do 'AI is fine' — you do 'AI is great here, no thanks over there.' You judge it case by case, and you judge it hard." |
+| Enthusiastic (>3.25) | The Enthusiastic Early Adopter | Steady | Default — your ratings consistently cluster high, no notable exceptions. | "You're eager to let AI take the wheel across most of what you rated." |
+| Enthusiastic (>3.25) | The Selective Believer | Polarized | You're rating almost everything Often/Always, but a few clear Never ratings stand out against that pattern. | "You're almost entirely sold on AI — with a few lines you've drawn and won't move on." |
+
+Note: this required rewriting two of the original *steady* summaries, which had accidentally been written with case-by-case/swing language that actually describes polarization:
+- **Cautious Pragmatist** — old *"you're open to AI here and there"* → new (above) — removed the swing implication.
+- **Curious Adopter** — old *"you just judge it case by case"* → new (above) — that phrase now lives on **Selective Enthusiast** instead, where it's actually true.
+
+### P1 — Polarization threshold logic (proposed, not yet implemented)
+
+Not yet built into `archetypes.ts`. Proposal to review before implementing:
+
+```
+POLE_LOW = 1    // Never
+POLE_HIGH = 4   // Always
+MIN_POLE_COUNT = 2       // at least 2 ratings at each pole — one outlier isn't a pattern
+MIN_POLE_SHARE = 0.15    // each pole must also be ≥15% of total ratings, so 2-out-of-50 doesn't count once sample grows
+MIN_RATINGS_FOR_SHAPE_CHECK = 7   // can't assess shape before one full bundle
+
+isPolarized =
+  totalRatings >= MIN_RATINGS_FOR_SHAPE_CHECK
+  AND lowCount  >= MIN_POLE_COUNT AND (lowCount  / totalRatings) >= MIN_POLE_SHARE
+  AND highCount >= MIN_POLE_COUNT AND (highCount / totalRatings) >= MIN_POLE_SHARE
+```
+
+Then: **archetype = pickTier(overallAverage) × (isPolarized ? Polarized : Steady)**.
+
+Key design decisions baked into this proposal, worth re-confirming before implementing:
+- **Requires literal presence of both true poles** (a Never *and* an Always), not just above/below-average spread — considered a pure stdDev approach and rejected it because it doesn't guarantee the "strong opinions at both ends" the copy promises.
+- **Runs on raw individual ratings, not the equal-domain-weighted average** — deliberate difference from the confidence-model decision above, since domain-averaging can hide real bimodality (e.g., a domain with one Never and one Always nets to a domain average of 2.5, erasing the extremes).
+
+Sanity-checked against real data during the brainstorm: a visitor who rated one bundle all "Often" and one bundle all "Never" (14 ratings, `lowCount=7, highCount=0`) correctly resolves to Steady (no "Always" ratings ever given, so no real positive extreme exists). A visitor with 4 Never + 4 Always ratings (average 2.5) correctly resolves to Polarized → **The Selective Realist**.
+
+### Next steps for whoever picks this up
+
+1. Confirm/adjust the polarization threshold constants above (or the naming/copy in the archetype table) — nothing here is final.
+2. Implement `isPolarized()` in `lib/prototype/archetypes.ts`, cross it with the existing `pickTier()`, and expand `TIERS` (or a new lookup) to the 8-row table above.
+3. Validate against synthetic sparse/dense/polarized/consistent cases per the original Definition of Done.
+4. Update `docs/PRD.md` Open Questions ("Attitude profile" framing row) once this ships, since it currently still reads as unresolved.
