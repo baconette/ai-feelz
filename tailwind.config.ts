@@ -42,8 +42,8 @@ const config: Config = {
         heading: "var(--heading-font-weight)",
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "sans-serif"],
-        heading: ["var(--font-geist-sans)", "sans-serif"],
+        sans: ["var(--font-varela)", "sans-serif"],
+        heading: ["var(--font-varela)", "sans-serif"],
       },
     },
   },
