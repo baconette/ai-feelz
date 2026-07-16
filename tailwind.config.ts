@@ -36,6 +36,7 @@ const config: Config = {
       },
       boxShadow: {
         shadow: "var(--shadow)",
+        card: "var(--card-shadow)",
       },
       fontWeight: {
         base: "var(--base-font-weight)",
