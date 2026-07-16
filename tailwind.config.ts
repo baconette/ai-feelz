@@ -36,14 +36,15 @@ const config: Config = {
       },
       boxShadow: {
         shadow: "var(--shadow)",
+        card: "var(--card-shadow)",
       },
       fontWeight: {
         base: "var(--base-font-weight)",
         heading: "var(--heading-font-weight)",
       },
       fontFamily: {
-        sans: ["var(--font-geist-sans)", "sans-serif"],
-        heading: ["var(--font-geist-sans)", "sans-serif"],
+        sans: ["var(--font-varela)", "sans-serif"],
+        heading: ["var(--font-varela)", "sans-serif"],
       },
     },
   },
