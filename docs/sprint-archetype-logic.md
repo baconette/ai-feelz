@@ -137,9 +137,77 @@ Key design decisions baked into this proposal, worth re-confirming before implem
 
 Sanity-checked against real data during the brainstorm: a visitor who rated one bundle all "Often" and one bundle all "Never" (14 ratings, `lowCount=7, highCount=0`) correctly resolves to Steady (no "Always" ratings ever given, so no real positive extreme exists). A visitor with 4 Never + 4 Always ratings (average 2.5) correctly resolves to Polarized → **The Selective Realist**.
 
+### New direction — domain-affinity archetypes (supersedes the 8-archetype table above)
+
+The tier × polarization table and its polarization proposal are **on hold, not implemented, and not the current plan** — a design pivot changes what the archetype is even for. Instead of naming *how strongly* someone feels overall, the archetype now names *which domain they diverge on most* — meant to read as more fun and more concretely tied to the content than an abstract level label.
+
+**Scope note:** this also reopens something the original sprint explicitly fixed — "changing the Likert axis itself... stays fixed for this sprint." That constraint is being lifted: the rating scale is moving from 4-point to 5-point.
+
+**5-point Likert scale**: Never (1) · Rarely (2) · Sometimes (3) · Often (4) · Always (5), midpoint 3. `MIN_RATINGS_PER_DOMAIN` and any absolute cutoffs need re-deriving against the new range — nothing from the 4-point tiers carries over numerically.
+
+**Model: 10 domains × 2 directions = 20 domain archetypes, plus 2 catch-alls = 22 total**
+
+Decision reversed from the first pass: rather than one name per domain with copy branching by direction, warm and cool now get **fully distinct names per domain** (like the old Steady/Polarized split) — this doubles the domain-archetype count from 10 to 20 and pushes the total past the original 6–10 cap. Deliberate tradeoff, made for the sake of sharper, more specific copy per direction rather than one name doing double duty.
+
+#### Mechanics, in detail
+
+1. **Ratings input**: each use case rating is 1–5 under the new scale (Never…Always).
+2. **Confident domains**: a domain counts only once it has `≥ MIN_RATINGS_PER_DOMAIN` ratings (currently 2, per the P0 decision above — needs re-deriving for the 5-point range, but the *mechanism* — excluding low-n domains entirely rather than downweighting them — is unchanged). Domains below this are excluded from every step below, not just discounted.
+3. **Own overall baseline**: the equal-domain-weighted mean of all confident domains' averages (P0 decision, unchanged) — this is the visitor's personal reference point, not a fixed midpoint like 3.
+4. **Per-domain deviation**: for every confident domain, `deviation = domainAverage − ownOverallAverage`. This measures how that domain compares to *this visitor's own* norm, not an absolute scale.
+5. **Standout selection** — this is where the two new catch-alls plug in:
+   - If `confidentDomains.length < 2` → **The Blank Slate**. With only one (or zero) confident domains, deviation is either undefined or trivially `0` by construction (a single domain's average *is* the overall average under equal-domain-weighting) — that's a data-coverage gap, not a real personality signal, so it gets its own coverage-aware archetype rather than being misread as "perfectly flat."
+   - Else, compute `maxAbsDeviation = max(|deviation_d|)` across confident domains. If `maxAbsDeviation < MIN_STANDOUT_DEVIATION` (proposed `0.3` on the 5-point scale, open to tuning) → **The Even Keel**. Here there's enough data to compare domains, and they genuinely don't diverge — a real, distinct profile, not a data gap.
+   - Otherwise, **standout domain** = the confident domain with the largest `|deviation|`. **Tie-break**: equal (or near-equal) `|deviation|` is resolved in favor of the domain with the higher rating count — more data behind the signal wins.
+6. **Direction & naming**: `sign(deviation_standout)` picks which of the two distinct archetype names for that domain applies — positive (`> 0`) → warm name, negative (`< 0`) → cool name. Each of the 10 domains has its own warm and cool name and copy (20 total), fully independent text, not a shared template.
+7. **Badges layer on top, unconditionally**: Level (5-point overall average, bucketed — cutoffs TBD) and Polarization (steady vs. polarized, pole logic from the proposal above with poles redefined as 1 and 5) are computed independently of the standout-domain logic and rendered as badges alongside *whichever* of the 22 archetypes was selected, including the two catch-alls (e.g. "The Even Keel · Curious · Steady").
+
+#### Worked example
+
+A visitor has rated: Healthcare `[4, 5, 4]` (n=3, avg 4.33), Mobility `[2, 1]` (n=2, avg 1.5), Finances `[3]` (n=1 — below `MIN_RATINGS_PER_DOMAIN`, excluded), Education `[3, 4, 3, 3]` (n=4, avg 3.25).
+
+- Confident domains: Healthcare (4.33), Mobility (1.5), Education (3.25). Finances is dropped for insufficient count.
+- Own overall baseline = `(4.33 + 1.5 + 3.25) / 3 = 3.03`.
+- Deviations: Healthcare `+1.30`, Mobility `−1.53`, Education `+0.22`.
+- `maxAbsDeviation = 1.53` (Mobility), which clears the `0.3` standout threshold, so no catch-all triggers.
+- Standout domain = Mobility, deviation is negative → cool direction → **archetype = The Backseat Driver**, badges rendered alongside it based on the overall average (3.03) and the separate polarization check.
+
+Two supporting cases for the catch-alls:
+
+- **Even Keel case**: confident domains Healthcare (3.1), Finances (3.0), Education (2.9), Media & Culture (3.2) → own average `3.05`; deviations `+0.05, −0.05, −0.15, +0.15`. `maxAbsDeviation = 0.15 < 0.3` → **The Even Keel** triggers regardless of the actual domain values.
+- **Blank Slate case**: a visitor who has only completed part of one 7-card bundle, with ratings spread thin enough that only one domain reaches `n ≥ 2` (all others sit at `n=1` or `n=0`) → confident domain count `= 1 < 2` → **The Blank Slate** triggers, independent of what that one domain's rating was.
+
+#### Archetype set (22 total)
+
+| Domain | Archetype | Trigger | Summary copy |
+|---|---|---|---|
+| Healthcare | The Trusting Patient | Standout = Healthcare, deviation > 0 | "When it comes to your health, you're the first to hand AI the chart — this is where your trust runs deepest." |
+| Healthcare | The Second Opinion | Standout = Healthcare, deviation < 0 | "Your body is where you draw the clearest line — you want a human take before AI gets a say." |
+| Finances | The Open Ledger | Standout = Finances, deviation > 0 | "Money is where you're most willing to let AI take the wheel — numbers don't lie, and apparently neither does the algorithm." |
+| Finances | The Penny Pincher | Standout = Finances, deviation < 0 | "Your money is the one thing you're keeping firmly in human hands — no algorithm gets near the account." |
+| Home & Personal Life | The Open Door | Standout = Home & Personal Life, deviation > 0 | "Home is where you've let AI in the most — from your calendar to your relationships, it's practically part of the household." |
+| Home & Personal Life | The Private Room | Standout = Home & Personal Life, deviation < 0 | "Home is sacred ground — this is the one room AI hasn't been invited into." |
+| Leisure & Hospitality | The Concierge | Standout = Leisure & Hospitality, deviation > 0 | "Vacation planning and downtime are where you hand it over gladly — let the algorithm book the trip." |
+| Leisure & Hospitality | The Do-Not-Disturb | Standout = Leisure & Hospitality, deviation < 0 | "Your downtime is yours — this is the one place you don't want AI's fingerprints." |
+| Robotics | The Machine Whisperer | Standout = Robotics, deviation > 0 | "Robots and automation are where you're most at ease — bring on the machines." |
+| Robotics | The Uncanny Valley | Standout = Robotics, deviation < 0 | "Physical automation is where your comfort runs out fastest — a screen is one thing, a machine in the room is another." |
+| Productivity | The Inbox Zero | Standout = Productivity, deviation > 0 | "Getting things done is where you're most eager to offload to AI — anything that saves you time earns your trust fast." |
+| Productivity | The Slow Burn | Standout = Productivity, deviation < 0 | "How you spend your time is oddly the one thing you don't want managed for you — some things are worth doing slow." |
+| Mobility | The Cruise Control | Standout = Mobility, deviation > 0 | "Getting from A to B is where you're most comfortable letting AI take over — hands off the wheel, literally." |
+| Mobility | The Backseat Driver | Standout = Mobility, deviation < 0 | "Getting around is the one place you still want a human hand on the wheel." |
+| Education | The Extra Credit | Standout = Education, deviation > 0 | "Learning and skill-building are where you're most willing to let AI teach — you'll take the help wherever it gets you further." |
+| Education | The Hall Monitor | Standout = Education, deviation < 0 | "Learning is the one place you don't want a shortcut — this still feels like something you should do yourself." |
+| Legal & Public Services | The Open Case | Standout = Legal & Public Services, deviation > 0 | "Paperwork, benefits, and bureaucracy are where you're most relieved to have AI step in — no one enjoys reading fine print." |
+| Legal & Public Services | The Fine Print | Standout = Legal & Public Services, deviation < 0 | "Rules, rights, and paperwork are the one place you don't trust a shortcut — too much on the line to hand it over." |
+| Media & Culture | The Remix | Standout = Media & Culture, deviation > 0 | "Art, writing, and culture are where you're most open to AI — you care more about the result than who (or what) made it." |
+| Media & Culture | The Art Defender | Standout = Media & Culture, deviation < 0 | "Creativity is the one place you want to stay entirely human-made — this is where AI hasn't earned a seat." |
+| — | The Even Keel | ≥2 confident domains, max\|deviation\| < 0.3 | "You're remarkably consistent — whatever your take on AI, it holds steady across everything you've rated so far, no domain pulling ahead of the rest." |
+| — | The Blank Slate | <2 confident domains | "You haven't rated enough across different domains yet for a clear lean to show — keep going and we'll find where you stand out." |
+
 ### Next steps for whoever picks this up
 
-1. Confirm/adjust the polarization threshold constants above (or the naming/copy in the archetype table) — nothing here is final.
-2. Implement `isPolarized()` in `lib/prototype/archetypes.ts`, cross it with the existing `pickTier()`, and expand `TIERS` (or a new lookup) to the 8-row table above.
-3. Validate against synthetic sparse/dense/polarized/consistent cases per the original Definition of Done.
-4. Update `docs/PRD.md` Open Questions ("Attitude profile" framing row) once this ships, since it currently still reads as unresolved.
+1. Tune `MIN_STANDOUT_DEVIATION` (proposed `0.3`) and the re-derived `MIN_RATINGS_PER_DOMAIN` for the 5-point scale against real or synthetic data — neither is validated yet.
+2. Decide and document the 5-point level badge cutoffs (replacing the old 4-point tier thresholds) and confirm the polarization pole redefinition (1 and 5 instead of 1 and 4).
+3. Implement in `lib/prototype/archetypes.ts`: per-domain deviation from the visitor's own overall average, the Blank Slate / Even Keel / standout-domain branch (with the ratings-count tie-break), the 20 domain archetypes keyed by `(domainId, direction)`, and level/polarization rendered as badges rather than folded into `TIERS`.
+4. Validate against synthetic sparse/dense/polarized/consistent cases, plus explicit Blank Slate, Even Keel, and tie-break cases (two domains with equal `|deviation|` and equal counts) to confirm behavior is deterministic.
+5. Update `docs/PRD.md` Open Questions ("Attitude profile" framing row) once this ships.

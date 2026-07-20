@@ -60,8 +60,8 @@ export function FriendComparison({
             : `You vs. code “${submittedCode}”`}
         </CardDescription>
         <p className="text-xs font-base text-muted-foreground">
-          Your overall average: {result.overallAverage.toFixed(1)} / 4 · Your friend:{' '}
-          {MOCK_FRIEND_OVERALL_AVERAGE.toFixed(1)} / 4
+          Your overall average: {result.overallAverage.toFixed(1)} / 5 · Your friend:{' '}
+          {MOCK_FRIEND_OVERALL_AVERAGE.toFixed(1)} / 5
         </p>
       </CardHeader>
 
@@ -75,7 +75,7 @@ export function FriendComparison({
                 <div className="h-3 flex-1 rounded-base border-2 border-border bg-secondary-background">
                   <div
                     className="h-full rounded-[3px] bg-main"
-                    style={{ width: `${(d.average / 4) * 100}%` }}
+                    style={{ width: `${(d.average / 5) * 100}%` }}
                   />
                 </div>
                 <span className="w-8 text-right text-xs font-base text-foreground">
@@ -86,7 +86,7 @@ export function FriendComparison({
                 <div className="h-3 flex-1 rounded-base border-2 border-border bg-secondary-background">
                   <div
                     className="h-full rounded-[3px] bg-chart-3"
-                    style={{ width: `${(friend / 4) * 100}%` }}
+                    style={{ width: `${(friend / 5) * 100}%` }}
                   />
                 </div>
                 <span className="w-8 text-right text-xs font-base text-muted-foreground">
