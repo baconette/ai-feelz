@@ -14,6 +14,9 @@ export function ArchetypeResults({ result }: { result: ArchetypeResult }) {
         <div className="mx-auto mb-2 h-14 w-14 rounded-full border-2 border-dashed border-border" />
         <CardTitle className="text-xl">{result.headline}</CardTitle>
         <CardDescription className="mx-auto max-w-sm">{result.summary}</CardDescription>
+        <div className="text-xs font-base text-muted-foreground">
+          {result.levelBadge} · {result.polarizationBadge}
+        </div>
       </CardHeader>
 
       <CardContent>
@@ -35,9 +38,9 @@ export function ArchetypeResults({ result }: { result: ArchetypeResult }) {
               <div key={d.domainId}>
                 <div className="mb-1 flex justify-between text-xs font-base text-foreground">
                   <span>{d.domainName}</span>
-                  <span>{d.average.toFixed(1)} / 4</span>
+                  <span>{d.average.toFixed(1)} / 5</span>
                 </div>
-                <Progress value={(d.average / 4) * 100} className="h-2" />
+                <Progress value={(d.average / 5) * 100} className="h-2" />
               </div>
             ))}
           </div>

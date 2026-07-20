@@ -1,14 +1,16 @@
-/** 1 = Never, 2 = Rarely, 3 = Often, 4 = All the time. "Never" is the negative pole. */
-export type LikertValue = 1 | 2 | 3 | 4
+/** 1 = Never, 2 = Some, 3 = Neutral, 4 = Most, 5 = Always. "Never" is the negative pole, "Always" the positive pole. */
+export type LikertValue = 1 | 2 | 3 | 4 | 5
 
 export const LIKERT_LABELS: Record<LikertValue, string> = {
   1: 'Never',
-  2: 'Rarely',
-  3: 'Often',
-  4: 'Always',
+  2: 'Some',
+  3: 'Neutral',
+  4: 'Most',
+  5: 'Always',
 }
 
 export const NEGATIVE_POLE: LikertValue = 1
+export const POSITIVE_POLE: LikertValue = 5
 
 export interface Rating {
   value: LikertValue
