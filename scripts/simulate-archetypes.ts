@@ -50,6 +50,7 @@ const useCases: NotionUseCase[] = DOMAIN_NAMES.flatMap((domainId) =>
     description: '',
     order: i,
     status: 'active',
+    published: true,
   }))
 )
 
