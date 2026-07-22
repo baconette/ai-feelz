@@ -9,6 +9,14 @@ export const LIKERT_LABELS: Record<LikertValue, string> = {
   5: 'Always',
 }
 
+export const LIKERT_EMOJIS: Record<LikertValue, string> = {
+  1: '🧠',
+  2: '🤳',
+  3: '😶',
+  4: '🦾',
+  5: '🤖',
+}
+
 export const NEGATIVE_POLE: LikertValue = 1
 export const POSITIVE_POLE: LikertValue = 5
 
