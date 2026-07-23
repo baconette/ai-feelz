@@ -38,20 +38,21 @@ As AI tooling becomes more prevalent across creative, professional, and personal
 - As a first-time visitor, I want to understand what this experience is about within 10 seconds so that I decide whether it's worth my time.
 - As a first-time visitor, I want to rate AI use cases across domains that feel relevant to my life so that I can see where I actually stand on AI.
 - As a first-time visitor, I want my ratings to feel consequential and expressive — not like a boring survey — so that I stay engaged through the full experience.
-- As a first-time visitor, I want to immediately see how my results compare to others like me so that I feel the experience was worth completing.
-- As a first-time visitor who completes the optional self-report, I want to see how my ratings compare specifically to people who share my age range, gender, and region so that the comparison feels personally relevant rather than generic.
-- As a first-time visitor who skips self-report, I want to still see a meaningful aggregate comparison against all visitors so that skipping does not diminish my results experience.
+- As a first-time visitor, I want to immediately see how my individual results look across rated domains so that I feel the experience was worth completing.
+- As a first-time visitor, I want to see how my individual results compare to others like me, how we agree or disagree most, so that I feel the experience was worth completing.
+- *As a first-time visitor who completes the optional demographic self-report, I want to see how my ratings compare specifically to people who share my age range, gender, and region so that the comparison feels personally relevant rather than generic.*
+- *As a first-time visitor who skips demographic self-report, I want to still see a meaningful aggregate comparison against all visitors so that skipping does not diminish my results experience.*
 
 ### Returning / Sharing Visitor
 
-- As a visitor arriving via a shared link, I want to see someone else's AI attitude profile alongside my own so that I can compare our views and feel motivated to complete my own rating.
+- As a visitor arriving via a shared link, I want to see someone else's AI attitude profile alongside my own so that I can compare how we agree or disagree most, and feel motivated to complete my own rating.
 - As a visitor who completed the experience, I want a visually distinctive shareable artifact so that I can post it and invite others to compare theirs.
 
 ### Curious Explorer
 
-- As someone unfamiliar with AI use cases, I want brief, jargon-free descriptions of each use case so that I can form an opinion without needing prior knowledge.
-- As someone unfamiliar with AI use cases, I can provide feedback about a use case by clicking a button to say "I don't understand this use case"
-- As someone interested in the "human V ai" debate, I want to optionally share why I wouldn't want AI to handle one of the use cases presented.
+- As someone unfamiliar with AI use cases, I want brief, jargon-free phrasing of each use case so that I can form an opinion without needing prior knowledge.
+- As someone unfamiliar with AI use cases, I can provide feedback about a use case phrasing by clicking a button to say "I don't understand this use case"
+- ~~As someone interested in the "human V ai" debate, I want to optionally share why I wouldn't want AI to handle one of the use cases presented.~~
 - As someone interested in the "human vs. AI creativity" debate, I want a visualization that helps me articulate my own intuitions so that I can engage more confidently in that conversation.
 
 ---
@@ -61,36 +62,38 @@ As AI tooling becomes more prevalent across creative, professional, and personal
 ### P0 — Must Have
 
 **1. AI Use Case Rating Module**
-- Visitors rate each AI use case on a scale to be finalized (see Open Questions #1). Rating scale options under consideration and to be decided by Design: **(a) human ↔ AI** (where does this use case sit on the authorship spectrum?) and **(b) uneasy ↔ enthusiastic** (how do you feel about this use case?). Additional narrative framings to explore: **(c) should exist ↔ should not exist** (a normative/ethical axis), **(d) replaces humans ↔ augments humans** (a labor/agency axis), **(e) trust ↔ distrust** (a credibility axis). Each framing produces meaningfully different data and a different emotional experience for visitors — this decision is a **design team action item**.
-- Use cases are organized into discrete **domains**, each with one or more **subdomains**. Confirmed domains and their subdomains, sourced from the Notion `AI-use-cases` database (103 use cases total): **Healthcare** (Diagnostics, Mental Health, Wellness & Fit Tracking, Disease Management/RPM, Robotics, Reproductive Health, End of Life), **Finances** (Finance Advisement, Wealth Management, Consumer Credit, Banking, Insurance, Real Estate), **Home & Personal Life** (Robotics, Home Management, Personal Assistance, Relationships), **Leisure & Hospitality** (Leisure, Travel), **Robotics** (Retail, Food Supply, Public Safety, Housing Supply, Hospitality), **Productivity** (Personal Assistance, Time Management, Media Management), **Mobility** (Autonomous Vehicles, Travel, Automotive, Insurance), **Education** (Skill Development, Career Development, Higher Education, K-12, Consumer Credit), **Legal & Public Services** (Accounting, Government Benefits, Public Services, Consumer Protection, Legal Self-Serve, Identity, Housekeeping), and **Media & Culture** (Writing, Film & TV, Visual Arts, Music, Fashion). Additional use cases may be added in future epics via new Notion records — no schema changes required.
+- Visitors [rate each AI use case on a scale](https://app.notion.com/p/3998e5480e978189b518f9f6e6e4b342?pvs=25) — finalized on design prototypes. Rating scale describes who should perform a given use case, a human or an AI/robot: **Never (1) · Some (2) · Neutral (3) · Most (4) · Always (5), midpoint 3**. This framing produces meaningfully different data and a different emotional experience for visitors than the alternatives previously considered.
+- [Use cases are organized](https://app.notion.com/p/3998e5480e9781fdbe9ef7b2dec43042?pvs=25) into discrete **domains**, each with one or more **subdomains**. (103 use cases total.) Additional use cases may be added in future epics via new Notion records — no schema changes required.
 - The app must support incremental use case addition without requiring a full re-deploy.
-- Each use case may include a short, plain-language description (≤2 sentences) — descriptions are optional per use case; when present, they require no assumed AI knowledge to understand.
-- If a use case has no description, or a visitor doesn't understand it as written, the visitor can request that an explanation/description be added to it. This is a lightweight flag/request action, not a live AI-generated explanation — requests are queued for the content team to address.
-- If a visitor rates a use case as **should not exist**, **uneasy**, or **distrust** (whichever negative pole applies under the selected rating axis, see Open Questions #1), they are offered an optional free-text field to explain why they chose that rating. This field is never required and only appears after one of these specific negative ratings is selected — it is not shown for neutral or positive ratings.
-- Although use cases are organized into domains and subdomains at the data layer, the visitor may or may not them grouped or labeled that way. The visitor is served **7 randomized use cases per bundle**, drawn without regard to domain or subdomain, so the rating experience feels like a continuous stream rather than a category-by-category survey. After completing a 7-use-case bundle, the visitor chooses whether to continue with another randomized bundle or stop. Domains and subdomains remain the organizing structure for content management, the Supabase schema, and analytics — not for the visitor-facing rating flow.
-- After finishing each 7-use-case bundle, the visitor can view their results visualization (see Requirement 2) before deciding whether to continue rating another bundle. Results reflect all bundles completed so far, not just the most recent one.
+- ~~Each use case may include a short, plain-language description (≤2 sentences) — descriptions are optional per use case; when present, they require no assumed AI knowledge to understand.~~
+- If a visitor doesn't understand a use case as written, the visitor can request that an explanation be added to it. This is a lightweight flag/request action, not a live AI-generated explanation — requests are queued for the content team to address.
+- If a visitor wants to change their previous use case rating, they can go back by clicking a back button.
+- ~~If a visitor rates a use case as **never**, they are offered an optional free-text field to explain why they chose that rating. This field is never required and only appears after one of these specific negative ratings is selected — it is not shown for neutral or positive ratings.~~
+- Since use cases are organized into domains, the visitor will see them labeled that way. The visitor is served **10 use cases per bundle**, drawn without regard to domain or subdomain, so the rating experience feels like a continuous stream rather than a category-by-category survey. ~~After completing a 7-use-case bundle, the visitor sees results and can choose whether to continue with another randomized bundle or stop. Domains and subdomains remain the organizing structure for content management, the Supabase schema, and analytics — not for the visitor-facing rating flow.~~
+- A first-time visitor is served the ten featured use cases from 5 specific domains, so 2 per domain. This should be flagged in the database as featured first-time visitor use cases.
+- After finishing each 10-use-case bundle, the visitor can view their results visualization (see Requirement 2) before deciding whether to continue rating another bundle. Results reflect all bundles completed so far, not just the most recent one.
 - Acceptance criteria:
   - [ ] A visitor can complete all ratings in a single session without account creation
-  - [ ] Each use case is presented with its description visible before rating, when a description exists for that use case
-  - [ ] Use case descriptions are jargon-free and require no prior AI knowledge to understand
-  - [ ] A visitor can request an explanation/description be added to a use case, whether or not it currently has one
-  - [ ] A visitor who rates a use case as should not exist, uneasy, or distrust is shown an optional free-text field asking why
-  - [ ] The optional free-text field does not appear for any other rating value
+  - [ ] Each use case is presented with its domain badge visible
+  - [ ] Use case phrasing is jargon-free and requires no prior AI knowledge to understand
+  - [ ] A visitor can request a better phrasing be added to a use case
   - [ ] The interaction is touch and mouse compatible
-  - [ ] Use cases are served in randomized bundles of 7, drawn across domains and subdomains without visible grouping or labeling
-  - [ ] Progress is visible so visitors know how far along they are within the current 7-use-case bundle
+  - [ ] Use cases are served in randomized bundles of 10, drawn across domains and subdomains, with a visible badge labeling the domain they belong to
+  - [ ] Progress is visible so visitors know how far along they are within the current 10-use-case bundle
   - [ ] After completing a bundle, the visitor is presented with a clear choice to view results or continue to another bundle
   - [ ] The results visualization reflects the visitor's cumulative ratings across all bundles completed so far
   - [ ] New domains and subdomains can be added to the underlying data without breaking existing use cases or visitor flows
 
 **2. Individual Results Visualization**
-- Upon completing a 7-use-case bundle (or choosing to stop after any bundle), the visitor sees a personalized visualization of their results, reflecting all ratings submitted so far.
+- Upon completing a 10-use-case bundle (or choosing to stop after any bundle), the visitor sees a personalized visualization of their results, reflecting all ratings submitted so far.
 - The visualization must make the visitor's overall "AI attitude profile" legible at a glance — not just a list of scores.
-- Visualization type is a **design team action item**, to be decided after rating scale and domain list are confirmed (see Open Questions #2).
+- Visualization type consists of two parts:
+  - An archetype based on the defined archetype logic
+  - A graph/visualization demonstrating per-domain rating. When ideating this, generate at least 3 different suggestions.
 - Acceptance criteria:
   - [ ] Results appear immediately after the final rating, with no loading state > 2 seconds
-  - [ ] The visualization is readable without any additional explanation copy
-  - [ ] The visitor can see their rating for each individual use case within the visualization or on demand
+  - [ ] The visualization is readable with minimal explanation copy
+  - [ ] The visitor can see their rating for each domain within the visualization or on demand
 
 **3. Comparison Visualization**
 - After viewing individual results:
@@ -98,7 +101,7 @@ As AI tooling becomes more prevalent across creative, professional, and personal
   - Visitors can see how their ratings compare to an aggregate of all previous visitors.
 - All ratings are stored anonymously server-side in **Supabase**. This is the confirmed architecture — no PII is collected or stored.
 - Aggregate data updates in real time (or near-real time) as new visitors complete the experience.
-- A minimum response threshold of 25 respondents must be met before aggregate data is surfaced, to ensure social proof is meaningful rather than misleading. **Exact threshold is a design team action item** (see Open Questions #4).
+- [A minimum response threshold of 25](https://app.notion.com/p/3998e5480e978199b359c78593a57d13?pvs=25) respondents must be met before aggregate data is surfaced, to ensure social proof is meaningful rather than misleading.
 - The Supabase schema must treat domains and use cases as configurable records, not hardcoded structures. This ensures new domains can be added at the data layer without schema migrations or breaking changes to existing domain data.
 - Acceptance criteria:
   - [ ] Anonymous ratings are written to Supabase on submission
@@ -108,7 +111,7 @@ As AI tooling becomes more prevalent across creative, professional, and personal
   - [ ] Adding a new domain and its use cases requires no schema changes — only new records
 
 **4. Shareable Results Artifact**
-- Visitors can share their individual results as a unique URL.
+- [Visitors can share](https://app.notion.com/p/3998e5480e9781eaa294fcba38d3fb20?pvs=25) their individual results as a unique URL.
 - The shared URL encodes or retrieves the visitor's result profile and prompts the viewer to take the experience themselves.
 - The shared encoded URL is used to compare a new visitor's results with the results from the encoded URL that led them to the app.
 - The shared artifact must be visually self-contained and interpretable without context.
@@ -122,9 +125,12 @@ As AI tooling becomes more prevalent across creative, professional, and personal
 ### P1 — Nice to Have
 
 **5. AI Impact Explainer — contextual consequence layer**
-- After rating a use case (or domain), visitors can optionally dive deeper into the real-world consequences of that AI application across four impact dimensions: **jobs/labor**, **economy**, **health**, and **industry/sector**.
+- After rating a bundle of use cases, visitors can optionally dive deeper into the real-world consequences of that AI application across some dimensions: **jobs/labor**, **economy**, **health**, and **industry/sector**.
 - Recommended format: a **scrollable, card-based explainer panel** that surfaces after rating — not before, to avoid priming responses. Each impact card is brief (2–3 sentences + a key stat), scannable, and editorially curated. Think less "Wikipedia article," more "what your informed friend would tell you."
-- Alternative formats to explore: inline tooltip on hover (lighter lift, lower engagement), a dedicated "impact" tab on the results screen, or a full-screen contextual drawer. Format is a **design decision**.
+- Alternative formats to explore:
+  - Inline tooltip on hover (lighter lift, lower engagement)
+  - A dedicated "impact" tab on the results screen
+  - Or a full-screen contextual drawer. Format is a **design decision**.
 - This feature turns the app from a pure sentiment tool into something with lasting educational value — a meaningful differentiator.
 - Acceptance criteria:
   - [ ] Impact content is optional and never shown before the visitor submits their rating (no priming)
@@ -132,44 +138,50 @@ As AI tooling becomes more prevalent across creative, professional, and personal
   - [ ] Content is written in plain language appropriate for a general Millennial/Gen Z audience
   - [ ] The explainer is skippable — visitors can proceed to results without engaging with it
 
+*The following P1 items are deprioritized relative to #5 above, per latest Notion review:*
+
 **6. Domain-level filtering in aggregate view**
-- Visitors can filter the aggregate comparison by domain (e.g., "how do my creative AI ratings compare to others' creative ratings").
+- *Visitors can filter the aggregate comparison by domain (e.g., "how do my creative AI ratings compare to others' creative ratings").*
 
 **7. Lightweight Demographic Self-Report**
-- After completing all ratings and before results are shown, visitors are presented with an optional self-report screen collecting three fields: **age range**, **gender**, and **region** (U.S. state or broad region).
-- The screen is explicitly optional and skippable — visitors who skip proceed directly to their individual results with no penalty.
-- Visitors who complete self-report unlock a **filtered aggregate view**, allowing them to compare their ratings against peers who share their demographic profile rather than the full visitor pool.
-- Demographic data is stored anonymously in Supabase alongside the visitor's ratings, with no PII attached.
-- Acceptance criteria:
-  - [ ] Self-report screen appears after final rating submission and before the results visualization
-  - [ ] All three fields (age range, gender, region) are presented on a single screen — no multi-step flow
-  - [ ] The screen is skippable via a clearly labeled action (e.g., "Skip to results")
-  - [ ] Visitors who complete self-report see a filtered aggregate view segmented by their demographic profile
-  - [ ] Visitors who skip self-report see the standard unfiltered aggregate view
-  - [ ] Demographic fields are stored anonymously in Supabase alongside ratings — no PII collected
+- *After completing all ratings and before results are shown, visitors are presented with an optional self-report screen collecting three fields: **age range**, **gender**, and **region** (U.S. state or broad region).*
+- *The screen is explicitly optional and skippable — visitors who skip proceed directly to their individual results with no penalty.*
+- *Visitors who complete self-report unlock a **filtered aggregate view**, allowing them to compare their ratings against peers who share their demographic profile rather than the full visitor pool.*
+- *Demographic data is stored anonymously in Supabase alongside the visitor's ratings, with no PII attached.*
+- *Acceptance criteria:*
+  - [ ] *Self-report screen appears after final rating submission and before the results visualization*
+  - [ ] *All three fields (age range, gender, region) are presented on a single screen — no multi-step flow*
+  - [ ] *The screen is skippable via a clearly labeled action (e.g., "Skip to results")*
+  - [ ] *Visitors who complete self-report see a filtered aggregate view segmented by their demographic profile*
+  - [ ] *Visitors who skip self-report see the standard unfiltered aggregate view*
+  - [ ] *Demographic fields are stored anonymously in Supabase alongside ratings — no PII collected*
 
 **8. Animated / progressive reveal of results**
-- Results visualization builds progressively as the visitor completes ratings, creating anticipation and engagement.
+- *Results visualization builds progressively as the visitor completes ratings, creating anticipation and engagement.*
 
 **9. "Human vs. AI creativity" narrative summary**
-- After completing ratings, visitors receive a one-line characterization of their overall stance (e.g., "You're a skeptical pragmatist" or "You're an early adopter with creative guardrails") — framing TBD and is a **content/design decision**.
+- *After completing ratings, visitors receive a one-line characterization of their overall stance (e.g., "You're a skeptical pragmatist" or "You're an early adopter with creative guardrails") — framing TBD and is a **content/design decision**.*
 
 ---
 
 ### P2 — Future Considerations
 
+*Deprioritized — see Notion for current status.*
+
 **10. Facilitated group / cohort mode**
-- Organizations (schools, companies, conferences) can run a facilitated version where a group completes the experience simultaneously and results are aggregated live for the group.
+- *Organizations (schools, companies, conferences) can run a facilitated version where a group completes the experience simultaneously and results are aggregated live for the group.*
 
 **11. Revisit & compare over time**
-- Visitors can optionally save their results (via a generated unique URL) and return to see how their views change over time or after new AI developments.
+- *Visitors can optionally save their results (via a generated unique URL) and return to see how their views change over time or after new AI developments.*
 
 **12. Curator / editorial layer**
-- A curated editorial experience that adds context to outlier data points — e.g., "People who work in creative fields rated AI music generation 30% lower than the general population."
+- *A curated editorial experience that adds context to outlier data points — e.g., "People who work in creative fields rated AI music generation 30% lower than the general population."*
 
 ---
 
 ## Success Metrics
+
+*Deprioritized — see Notion for current status.*
 
 ### Leading Indicators (measure at 1 week and 1 month post-launch)
 
@@ -190,24 +202,6 @@ As AI tooling becomes more prevalent across creative, professional, and personal
 
 ---
 
-## Open Questions
-
-| Question | Owner | Status | Notes |
-|---|---|---|---|
-| **Rating scale / narrative framing**: Which axis (or axes) will visitors rate on? Options: (a) human ↔ AI, (b) uneasy ↔ enthusiastic, (c) should exist ↔ should not exist, (d) replaces ↔ augments, (e) trust ↔ distrust. Shapes data model and all visualizations. | **Design** | 🔴 Action item — blocks data model | E&C will prototyped 2, 3, 5 range input designs · Don't want AI to do this, Do want AI to do this · Will polish axes names later · Or how could answers generate axes relevant to user? |
-| **Individual results viz type**: What visual form best represents an individual's AI attitude profile? To be decided after rating scale and domain list are confirmed. | **Design** | 🔴 Action item — blocks front-end build | Come up with categories for people to be classified into based on their answers and categories · Compare with friend based on the link they shared |
-| **Use case list per domain**: What are the specific use cases within each domain? Should any be intentionally provocative to create differentiation in responses? | **Design + Content** | 🔴 Action item — blocks rating module per epic | |
-| **Aggregate minimum threshold**: How many responses before aggregate data is shown? What placeholder state is shown before the threshold is met? | **Design + Engineering** | 🔴 Action item — blocks aggregate view | |
-| **Anchoring bias mitigation**: Aggregate shown after individual results only, or offer a toggle? What if the visitor wants to see aggregate *while* rating? | **Design** | 🟡 Non-blocking — affects UX flow | |
-| **Shareability format**: Unique URL only (v1), or also a downloadable static image? Static image requires server-side rendering infrastructure and is a scope decision. | **Engineering** | 🟡 Non-blocking — URL confirmed for v1, image is P1 | |
-| **Mobile responsiveness**: Desktop-first with graceful mobile degradation, or full mobile parity from the start? | **Design + Engineering** | 🟡 Non-blocking — affects build scope | |
-| **"Attitude profile" framing**: Labeled archetype vs. purely visual/quantitative profile? Archetypes risk oversimplification. | **Design + Content** | 🟢 P1 — decide before Phase 2 | |
-| **Demographic slice minimum threshold**: The filtered aggregate view (unlocked by self-report) faces the same minimum response problem as the main aggregate, but compounded by smaller slice sizes. Should each demographic slice require its own minimum threshold before the filtered view is shown? If the slice has not met the threshold, do we fall back to the full aggregate, show a confidence caveat, or hide the filtered view entirely? | **Design + Engineering** | 🟡 Non-blocking — must resolve before P1 #6 ships | |
-
-> **Resolved:** Data persistence → anonymous ratings stored server-side in Supabase. No PII collected. Privacy risk: low.
-
----
-
 ## Inspiration & Reference Apps
 
 Comparable interactive experiences worth studying for UX patterns, visual language, rating mechanics, and results presentation:
@@ -225,11 +219,10 @@ Comparable interactive experiences worth studying for UX patterns, visual langua
 
 ## Timeline Considerations
 
-- **No hard deadlines identified** — project is in early exploration.
-- Delivery model: **continuous, domain-by-domain**. Each domain (Creative, Productivity, Personal, Civic/Professional) is a self-contained epic that can be scoped, built, and shipped independently.
+*Deprioritized — see Notion for current status.*
+
 - Recommended sequencing:
   - **Pre-build:** Resolve action items #1, #3, and #2 (in that order) before writing engineering tickets for any domain.
   - **Epic 1:** Rating module + individual results viz + aggregate + share link for Domain 1. Engineering must deliver a domain-agnostic Supabase schema in this epic — domains and use cases as configurable records, not hardcoded structures. This is a prerequisite for all subsequent epics.
   - **Epic 2–N:** Additional domains, each adding use cases to an established, working system.
   - **Phase 2:** P1 features layered in after two or more domains are live and aggregate data is meaningful.
-- Recommend a design sprint on open questions #1 and #3 as the immediate next step.

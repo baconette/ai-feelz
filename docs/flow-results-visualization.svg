@@ -51,5 +51,5 @@
 
 <rect x="60" y="480" width="16" height="16" class="system"/>
 <text x="86" y="492" class="label">system process</text>
-<text x="60" y="530" class="sub">Resolved: results always reflect cumulative ratings across every bundle completed so far, not a per-bundle snapshot. Visitor reaches this screen after each bundle by choosing "view results" over "continue rating" (see Feature 1 flow).</text>
+<text x="60" y="530" class="sub">Resolved: results always reflect cumulative ratings across every bundle completed so far, not a per-bundle snapshot.</text>
 </svg>
