@@ -82,6 +82,10 @@ export function PrototypeFlow({
     }
   }
 
+  function handleBack() {
+    setBundleIndex((i) => Math.max(0, i - 1))
+  }
+
   function reset() {
     setRatings({})
     setBundle([])
@@ -93,9 +97,15 @@ export function PrototypeFlow({
   }
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-10">
+    <div className="relative isolate mx-auto max-w-lg px-4 py-10">
       {view === 'intro' && (
-        <Card className="text-center">
+        <div
+          className="fixed inset-0 z-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/dunes.gif')" }}
+        />
+      )}
+      {view === 'intro' && (
+        <Card className="relative z-10 text-center">
           <CardHeader>
             <CardTitle className="text-xl">Where do you draw the line?</CardTitle>
             <CardDescription>
@@ -116,7 +126,10 @@ export function PrototypeFlow({
           useCase={bundle[bundleIndex]}
           index={bundleIndex + 1}
           total={bundle.length}
+          initialRating={ratings[bundle[bundleIndex].notionId]}
+          canGoBack={bundleIndex > 0}
           onSubmit={handleRatingSubmit}
+          onBack={handleBack}
           onRequestExplanation={() => showAck("Flagged for the content team — thanks!")}
         />
       )}
