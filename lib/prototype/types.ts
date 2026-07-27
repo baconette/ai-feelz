@@ -3,9 +3,9 @@ export type LikertValue = 1 | 2 | 3 | 4 | 5
 
 export const LIKERT_LABELS: Record<LikertValue, string> = {
   1: 'Never',
-  2: 'Some',
+  2: 'Sometimes',
   3: 'Neutral',
-  4: 'Most',
+  4: 'Most times',
   5: 'Always',
 }
 

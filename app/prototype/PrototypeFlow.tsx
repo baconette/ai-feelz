@@ -6,16 +6,16 @@ import type { NotionDomain, NotionUseCase } from '@/lib/notion/client'
 import { computeArchetype } from '@/lib/prototype/archetypes'
 import type { Rating, RatingsMap } from '@/lib/prototype/types'
 import { UseCaseCard } from './components/UseCaseCard'
+import { LandingHero } from './components/LandingHero'
 import { ArchetypeResults } from './components/ArchetypeResults'
 import { AggregateComparison } from './components/AggregateComparison'
 import { FriendComparison } from './components/FriendComparison'
 import { ShareScreen } from './components/ShareScreen'
 import type { CompareTab } from './components/CompareTabs'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 
-const BUNDLE_SIZE = 7
+const BUNDLE_SIZE = 10
 
 type View = 'intro' | 'rating' | 'results'
 
@@ -43,9 +43,7 @@ export function PrototypeFlow({
   const [ratings, setRatings] = useState<RatingsMap>({})
   const [bundle, setBundle] = useState<NotionUseCase[]>([])
   const [bundleIndex, setBundleIndex] = useState(0)
-  const [completedBundles, setCompletedBundles] = useState(0)
   const [showThresholdPlaceholder, setShowThresholdPlaceholder] = useState(false)
-  const [ack, setAck] = useState<string | null>(null)
   const [shareOpen, setShareOpen] = useState(false)
   const [showAggregate, setShowAggregate] = useState(false)
   const [compareTab, setCompareTab] = useState<CompareTab>('friend')
@@ -57,11 +55,6 @@ export function PrototypeFlow({
     () => computeArchetype(ratings, useCases, domains),
     [ratings, useCases, domains]
   )
-
-  function showAck(message: string) {
-    setAck(message)
-    setTimeout(() => setAck(null), 2000)
-  }
 
   function startBundle() {
     setBundle(makeBundle(useCases))
@@ -77,7 +70,6 @@ export function PrototypeFlow({
     if (bundleIndex + 1 < bundle.length) {
       setBundleIndex(bundleIndex + 1)
     } else {
-      setCompletedBundles((n) => n + 1)
       setView('results')
     }
   }
@@ -90,119 +82,96 @@ export function PrototypeFlow({
     setRatings({})
     setBundle([])
     setBundleIndex(0)
-    setCompletedBundles(0)
     setView('intro')
     setShareOpen(false)
     setShowAggregate(false)
   }
 
+  if (view === 'intro') {
+    return <LandingHero domains={domains} onStart={startBundle} />
+  }
+
   return (
-    <div className="relative isolate mx-auto max-w-lg px-4 py-10">
-      {view === 'intro' && (
-        <div
-          className="fixed inset-0 z-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/dunes.gif')" }}
-        />
-      )}
-      {view === 'intro' && (
-        <Card className="relative z-10 text-center">
-          <CardHeader>
-            <CardTitle className="text-xl">Where do you draw the line?</CardTitle>
-            <CardDescription>
-              Rate a handful of real AI use cases, then see how your attitude toward AI compares
-              to everyone else&apos;s.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button type="button" variant="neutral" size="lg" onClick={startBundle}>
-              Start rating
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+    <div className="relative isolate ml-20 max-w-lg px-4 pt-16 pb-10">
+      <div
+        className="fixed inset-0 z-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/legal/justice1.gif')" }}
+      />
 
-      {view === 'rating' && bundle[bundleIndex] && (
-        <UseCaseCard
-          useCase={bundle[bundleIndex]}
-          index={bundleIndex + 1}
-          total={bundle.length}
-          initialRating={ratings[bundle[bundleIndex].notionId]}
-          canGoBack={bundleIndex > 0}
-          onSubmit={handleRatingSubmit}
-          onBack={handleBack}
-          onRequestExplanation={() => showAck("Flagged for the content team — thanks!")}
-        />
-      )}
+      <div className="relative z-10">
+        {view === 'rating' && bundle[bundleIndex] && (
+          <UseCaseCard
+            useCase={bundle[bundleIndex]}
+            index={bundleIndex + 1}
+            total={bundle.length}
+            domains={domains}
+            initialRating={ratings[bundle[bundleIndex].notionId]}
+            canGoBack={bundleIndex > 0}
+            onSubmit={handleRatingSubmit}
+            onBack={handleBack}
+          />
+        )}
 
-      {view === 'results' && (
-        <div className="space-y-4">
-          <ArchetypeResults result={archetype} />
-          <div className="flex flex-wrap justify-center gap-3">
-            {!showAggregate && (
-              <Button type="button" onClick={() => setShowAggregate(true)}>
-                Compare my results
+        {view === 'results' && (
+          <div className="space-y-4">
+            <ArchetypeResults result={archetype} />
+            <div className="flex flex-wrap justify-center gap-3">
+              {!showAggregate && (
+                <Button type="button" onClick={() => setShowAggregate(true)}>
+                  Compare my results
+                </Button>
+              )}
+              <Button type="button" variant="neutral" onClick={startBundle}>
+                Continue rating
               </Button>
-            )}
-            <Button type="button" variant="neutral" onClick={startBundle}>
-              Continue rating
-            </Button>
-            <Button type="button" variant="neutral" onClick={() => setShareOpen(true)}>
-              Share my results
-            </Button>
+              <Button type="button" variant="neutral" onClick={() => setShareOpen(true)}>
+                Share my results
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {shareOpen && <ShareScreen onClose={() => setShareOpen(false)} onRestart={reset} />}
+        {shareOpen && <ShareScreen onClose={() => setShareOpen(false)} onRestart={reset} />}
 
-      <p className="mt-8 text-center text-xs font-base text-muted-foreground">
-        {completedBundles} round{completedBundles === 1 ? '' : 's'} complete · neobrutalist prototype
-      </p>
-
-      {view === 'results' && showAggregate && (
-        <div className="mt-6 space-y-4">
-          {compareTab === 'friend' ? (
-            <FriendComparison
-              result={archetype}
-              prefillCode={friendCodeFromLink}
-              activeTab={compareTab}
-              onTabChange={setCompareTab}
-            />
-          ) : (
-            <>
-              <AggregateComparison
+        {view === 'results' && showAggregate && (
+          <div className="mt-6 space-y-4">
+            {compareTab === 'friend' ? (
+              <FriendComparison
                 result={archetype}
-                showPlaceholder={showThresholdPlaceholder}
+                prefillCode={friendCodeFromLink}
                 activeTab={compareTab}
                 onTabChange={setCompareTab}
               />
-              <label className="flex items-center justify-center gap-2 text-xs font-base text-muted-foreground">
-                <Checkbox
-                  checked={showThresholdPlaceholder}
-                  onCheckedChange={(checked) => setShowThresholdPlaceholder(checked === true)}
+            ) : (
+              <>
+                <AggregateComparison
+                  result={archetype}
+                  showPlaceholder={showThresholdPlaceholder}
+                  activeTab={compareTab}
+                  onTabChange={setCompareTab}
                 />
-                Preview: not-enough-responses state
-              </label>
-            </>
-          )}
+                <label className="flex items-center justify-center gap-2 text-xs font-base text-muted-foreground">
+                  <Checkbox
+                    checked={showThresholdPlaceholder}
+                    onCheckedChange={(checked) => setShowThresholdPlaceholder(checked === true)}
+                  />
+                  Preview: not-enough-responses state
+                </label>
+              </>
+            )}
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setShowAggregate(false)}
-              className="text-sm font-base text-muted-foreground underline"
-            >
-              Hide comparison
-            </button>
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => setShowAggregate(false)}
+                className="text-sm font-base text-muted-foreground underline"
+              >
+                Hide comparison
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-
-      {ack && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 rounded-base border-2 border-border bg-secondary-background px-4 py-2 text-xs font-base text-foreground shadow-shadow">
-          {ack}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

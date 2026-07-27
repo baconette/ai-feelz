@@ -1,80 +1,108 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import type { NotionUseCase } from '@/lib/notion/client'
+import { useEffect, useState } from 'react'
+import { Info } from 'lucide-react'
+import type { NotionDomain, NotionUseCase } from '@/lib/notion/client'
 import type { LikertValue, Rating } from '@/lib/prototype/types'
+import { DOMAIN_COLORS, DEFAULT_DOMAIN_BADGE_CLASSES } from '@/lib/prototype/domain-colors'
 import { LikertControl } from './LikertControl'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
-const AUTO_ADVANCE_DELAY = 500
+const EXPLANATION_PLACEHOLDER = "There is no explanation, we'll get right to writing it."
 
 export function UseCaseCard({
   useCase,
   index,
   total,
+  domains,
   initialRating,
   canGoBack,
   onSubmit,
   onBack,
-  onRequestExplanation,
 }: {
   useCase: NotionUseCase
   index: number
   total: number
+  domains: NotionDomain[]
   initialRating?: Rating
   canGoBack: boolean
   onSubmit: (rating: Rating) => void
   onBack: () => void
-  onRequestExplanation: () => void
 }) {
   const [value, setValue] = useState<LikertValue | null>(initialRating?.value ?? null)
-  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [showExplanation, setShowExplanation] = useState(false)
 
   useEffect(() => {
     setValue(initialRating?.value ?? null)
-    return () => {
-      if (advanceTimer.current) clearTimeout(advanceTimer.current)
-    }
+    setShowExplanation(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useCase.notionId])
 
-  function selectValue(v: LikertValue) {
-    setValue(v)
-    if (advanceTimer.current) clearTimeout(advanceTimer.current)
-    advanceTimer.current = setTimeout(() => {
-      onSubmit({ value: v })
-      setValue(null)
-    }, AUTO_ADVANCE_DELAY)
+  const domainName = domains.find((d) => d.notionId === useCase.domainId)?.name ?? 'Other'
+
+  function handleNext() {
+    if (value === null) return
+    onSubmit({ value })
   }
 
   return (
     <Card>
-      <CardHeader>
-        <div className="text-xs font-base text-muted-foreground">
-          {index} of {total}
+      <CardHeader className="gap-3">
+        <Progress
+          value={(index / total) * 100}
+          className="h-2 border-2 border-muted-foreground bg-secondary-background"
+          indicatorClassName="border-none bg-muted-foreground"
+        />
+        <div className="flex items-center justify-between">
+          <Badge
+            variant="neutral"
+            className={DOMAIN_COLORS[domainName]?.badge ?? DEFAULT_DOMAIN_BADGE_CLASSES}
+          >
+            {domainName}
+          </Badge>
+          {canGoBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="text-xs font-base text-foreground underline hover:text-muted-foreground"
+            >
+              ← Back
+            </button>
+          )}
         </div>
-        <p className="text-base font-heading text-foreground sm:text-lg">{useCase.useCase}</p>
-        <button
-          type="button"
-          onClick={onRequestExplanation}
-          className="text-xs font-base text-muted-foreground underline decoration-dotted hover:text-foreground"
-        >
-          I don&apos;t understand this use case
-        </button>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <LikertControl value={value} onChange={selectValue} />
+        <p className="text-base font-heading text-foreground sm:text-lg">{useCase.useCase}</p>
+
+        <div className="-mt-2">
+          <button
+            type="button"
+            onClick={() => setShowExplanation((prev) => !prev)}
+            className="text-left text-xs font-base text-muted-foreground underline decoration-dotted hover:text-foreground"
+          >
+            Explain this question more
+          </button>
+          {showExplanation && (
+            <Alert className="mt-2 bg-background text-foreground">
+              <Info />
+              <AlertDescription>{EXPLANATION_PLACEHOLDER}</AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        <LikertControl value={value} onChange={setValue} />
       </CardContent>
 
-      {canGoBack && (
-        <CardFooter className="flex items-center justify-start">
-          <Button type="button" size="sm" variant="neutral" onClick={onBack}>
-            Back
-          </Button>
-        </CardFooter>
-      )}
+      <CardFooter className="justify-end">
+        <Button type="button" variant="neutral" onClick={handleNext} disabled={value === null}>
+          Next
+        </Button>
+      </CardFooter>
     </Card>
   )
 }

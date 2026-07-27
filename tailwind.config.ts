@@ -6,6 +6,7 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -45,6 +46,20 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-ibm-plex-mono)", "monospace"],
         heading: ["var(--font-space-mono)", "monospace"],
+      },
+      keyframes: {
+        marquee: {
+          from: { transform: "translateX(0%)" },
+          to: { transform: "translateX(-100%)" },
+        },
+        marquee2: {
+          from: { transform: "translateX(100%)" },
+          to: { transform: "translateX(0%)" },
+        },
+      },
+      animation: {
+        marquee: "marquee 50s linear infinite",
+        marquee2: "marquee2 50s linear infinite",
       },
     },
   },
