@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { Varela_Round } from "next/font/google";
+import { Space_Mono, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const varelaRound = Varela_Round({
+const spaceMono = Space_Mono({
   subsets: ["latin"],
-  weight: "400",
-  variable: "--font-varela",
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-ibm-plex-mono",
 });
 
 export const metadata: Metadata = {
@@ -20,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${varelaRound.variable} antialiased`}>
+      <body className={`${spaceMono.variable} ${ibmPlexMono.variable} antialiased`}>
         {children}
       </body>
     </html>
