@@ -114,7 +114,7 @@ export function PrototypeFlow({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button type="button" size="lg" onClick={startBundle}>
+            <Button type="button" variant="neutral" size="lg" onClick={startBundle}>
               Start rating
             </Button>
           </CardContent>
