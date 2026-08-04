@@ -1,6 +1,6 @@
 import type { ArchetypeResult } from '@/lib/prototype/archetypes'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+import { DomainAverageSlider } from './DomainAverageSlider'
 
 export function ArchetypeResults({
   result,
@@ -36,11 +36,8 @@ export function ArchetypeResults({
         <div className="space-y-3 text-left">
           {result.domainScores.map((d) => (
             <div key={d.domainId}>
-              <div className="mb-1 flex justify-between text-xs font-base text-foreground">
-                <span>{d.domainName}</span>
-                <span>{d.average.toFixed(1)} / 5</span>
-              </div>
-              <Progress value={(d.average / 5) * 100} className="h-2" />
+              <div className="mb-2 text-xs font-base text-foreground">{d.domainName}</div>
+              <DomainAverageSlider average={d.average} />
             </div>
           ))}
         </div>
