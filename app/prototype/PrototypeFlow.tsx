@@ -8,11 +8,6 @@ import type { Rating, RatingsMap } from '@/lib/prototype/types'
 import { UseCaseCard } from './components/UseCaseCard'
 import { LandingHero } from './components/LandingHero'
 import { ArchetypeResults } from './components/ArchetypeResults'
-import { AggregateComparison } from './components/AggregateComparison'
-import { FriendComparison } from './components/FriendComparison'
-import { ShareScreen } from './components/ShareScreen'
-import type { CompareTab } from './components/CompareTabs'
-import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 
 const BUNDLE_SIZE = 10
@@ -44,9 +39,6 @@ export function PrototypeFlow({
   const [bundle, setBundle] = useState<NotionUseCase[]>([])
   const [bundleIndex, setBundleIndex] = useState(0)
   const [showThresholdPlaceholder, setShowThresholdPlaceholder] = useState(false)
-  const [shareOpen, setShareOpen] = useState(false)
-  const [showAggregate, setShowAggregate] = useState(false)
-  const [compareTab, setCompareTab] = useState<CompareTab>('friend')
 
   const searchParams = useSearchParams()
   const friendCodeFromLink = searchParams.get('friend') ?? undefined
@@ -60,7 +52,6 @@ export function PrototypeFlow({
     setBundle(makeBundle(useCases))
     setBundleIndex(0)
     setView('rating')
-    setShowAggregate(false)
   }
 
   function handleRatingSubmit(rating: Rating) {
@@ -83,8 +74,6 @@ export function PrototypeFlow({
     setBundle([])
     setBundleIndex(0)
     setView('intro')
-    setShareOpen(false)
-    setShowAggregate(false)
   }
 
   if (view === 'intro') {
@@ -118,58 +107,18 @@ export function PrototypeFlow({
               result={archetype}
               onContinueRating={startBundle}
               bundleSize={BUNDLE_SIZE}
+              onRestart={reset}
+              prefillFriendCode={friendCodeFromLink}
+              hasAggregateThreshold={!showThresholdPlaceholder}
             />
-            <div className="flex flex-wrap justify-center gap-3">
-              {!showAggregate && (
-                <Button type="button" variant="neutral" onClick={() => setShowAggregate(true)}>
-                  ✌️ Compare with a friend
-                </Button>
-              )}
-              <Button type="button" variant="neutral" onClick={() => setShareOpen(true)}>
-                🔗 Share your results
-              </Button>
-            </div>
-          </div>
-        )}
 
-        {shareOpen && <ShareScreen onClose={() => setShareOpen(false)} onRestart={reset} />}
-
-        {view === 'results' && showAggregate && (
-          <div className="mt-6 space-y-4">
-            {compareTab === 'friend' ? (
-              <FriendComparison
-                result={archetype}
-                prefillCode={friendCodeFromLink}
-                activeTab={compareTab}
-                onTabChange={setCompareTab}
+            <label className="flex items-center justify-center gap-2 text-xs font-base text-muted-foreground">
+              <Checkbox
+                checked={showThresholdPlaceholder}
+                onCheckedChange={(checked) => setShowThresholdPlaceholder(checked === true)}
               />
-            ) : (
-              <>
-                <AggregateComparison
-                  result={archetype}
-                  showPlaceholder={showThresholdPlaceholder}
-                  activeTab={compareTab}
-                  onTabChange={setCompareTab}
-                />
-                <label className="flex items-center justify-center gap-2 text-xs font-base text-muted-foreground">
-                  <Checkbox
-                    checked={showThresholdPlaceholder}
-                    onCheckedChange={(checked) => setShowThresholdPlaceholder(checked === true)}
-                  />
-                  Preview: not-enough-responses state
-                </label>
-              </>
-            )}
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => setShowAggregate(false)}
-                className="text-sm font-base text-muted-foreground underline"
-              >
-                Hide comparison
-              </button>
-            </div>
+              Preview: not-enough-responses state
+            </label>
           </div>
         )}
       </div>

@@ -50,12 +50,8 @@ export function LandingHero({
           </h2>
 
           <p className="text-sm font-base text-main-foreground sm:text-base">
-            Learn about its different applications by choosing who, in your opinion, should
-            perform an activity, a human or an AI.
-          </p>
-
-          <p className="text-center text-xs font-base text-main-foreground">
-            Takes ~5 min · No sign-up needed
+            Learn about its different applications by choosing when you prefer a human or an AI
+            perform an activity.
           </p>
 
           <div className="flex flex-col items-center gap-3">
