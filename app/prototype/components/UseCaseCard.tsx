@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react'
 import { Info } from 'lucide-react'
 import type { NotionDomain, NotionUseCase } from '@/lib/notion/client'
 import type { LikertValue, Rating } from '@/lib/prototype/types'
-import { DOMAIN_COLORS, DEFAULT_DOMAIN_BADGE_CLASSES } from '@/lib/prototype/domain-colors'
+import {
+  DOMAIN_COLORS,
+  DEFAULT_DOMAIN_BADGE_CLASSES,
+  DEFAULT_DOMAIN_SENTENCE_UNDERLINE_CLASSES,
+} from '@/lib/prototype/domain-colors'
 import { LikertControl } from './LikertControl'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -13,6 +17,13 @@ import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 const EXPLANATION_PLACEHOLDER = "There is no explanation, we'll get right to writing it."
+
+const SENTENCE_PREFIXES = ['When should AI ', 'When should ']
+
+function splitSentence(sentence: string): { prefix: string; rest: string } {
+  const prefix = SENTENCE_PREFIXES.find((p) => sentence.startsWith(p)) ?? ''
+  return { prefix, rest: sentence.slice(prefix.length) }
+}
 
 export function UseCaseCard({
   useCase,
@@ -43,6 +54,7 @@ export function UseCaseCard({
   }, [useCase.notionId])
 
   const domainName = domains.find((d) => d.notionId === useCase.domainId)?.name ?? 'Other'
+  const { prefix, rest } = splitSentence(useCase.useCase)
 
   function handleNext() {
     if (value === null) return
@@ -77,7 +89,14 @@ export function UseCaseCard({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        <p className="text-base font-heading text-foreground sm:text-lg">{useCase.useCase}</p>
+        <p className="text-base font-heading text-foreground sm:text-lg">
+          {prefix}
+          <span
+            className={`underline decoration-4 underline-offset-4 ${DOMAIN_COLORS[domainName]?.sentenceUnderline ?? DEFAULT_DOMAIN_SENTENCE_UNDERLINE_CLASSES}`}
+          >
+            {rest}
+          </span>
+        </p>
 
         <div className="-mt-2">
           <button

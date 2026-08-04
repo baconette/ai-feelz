@@ -6,17 +6,13 @@ import Marquee from '@/components/ui/marquee'
 const HEADING_CLASS =
   'text-5xl font-heading uppercase leading-[0.95] tracking-tight text-background sm:text-6xl'
 
-const MARQUEE_EMOJIS = ['🧠', '🤳', '🦾', '🤖']
-
 function buildMarqueeItems(domains: NotionDomain[]) {
-  return domains.map((domain, i) => (
-    <span key={domain.notionId} className="inline-flex items-center gap-3">
-      <span
-        className={`font-heading underline decoration-4 underline-offset-4 ${DOMAIN_COLORS[domain.name]?.marquee ?? DEFAULT_DOMAIN_MARQUEE_CLASSES}`}
-      >
-        {domain.name}
-      </span>
-      <span aria-hidden>{MARQUEE_EMOJIS[i % MARQUEE_EMOJIS.length]}</span>
+  return domains.map((domain) => (
+    <span
+      key={domain.notionId}
+      className={`font-heading text-foreground underline decoration-4 underline-offset-4 ${DOMAIN_COLORS[domain.name]?.marqueeUnderline ?? DEFAULT_DOMAIN_MARQUEE_CLASSES}`}
+    >
+      {domain.name}
     </span>
   ))
 }

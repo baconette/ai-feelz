@@ -114,18 +114,19 @@ export function PrototypeFlow({
 
         {view === 'results' && (
           <div className="space-y-4">
-            <ArchetypeResults result={archetype} />
+            <ArchetypeResults
+              result={archetype}
+              onContinueRating={startBundle}
+              bundleSize={BUNDLE_SIZE}
+            />
             <div className="flex flex-wrap justify-center gap-3">
               {!showAggregate && (
-                <Button type="button" onClick={() => setShowAggregate(true)}>
-                  Compare my results
+                <Button type="button" variant="neutral" onClick={() => setShowAggregate(true)}>
+                  ✌️ Compare with a friend
                 </Button>
               )}
-              <Button type="button" variant="neutral" onClick={startBundle}>
-                Continue rating
-              </Button>
               <Button type="button" variant="neutral" onClick={() => setShareOpen(true)}>
-                Share my results
+                🔗 Share your results
               </Button>
             </div>
           </div>
