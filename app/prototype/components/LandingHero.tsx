@@ -32,7 +32,7 @@ export function LandingHero({
       />
 
       <div className="relative z-10 flex min-h-screen flex-col justify-center gap-10 py-16">
-        <div className="ml-20 w-full max-w-lg px-6">
+        <div className="mx-auto lg:mx-0 lg:ml-20 w-full max-w-[33rem] px-6">
           <h1 className={HEADING_CLASS}>
             AI
             <br />
@@ -42,7 +42,7 @@ export function LandingHero({
 
         <Marquee items={buildMarqueeItems(domains)} />
 
-        <div className="ml-20 w-full max-w-lg space-y-6 px-6">
+        <div className="mx-auto lg:mx-0 lg:ml-20 w-full max-w-[33rem] space-y-6 px-6">
           <h2 className={HEADING_CLASS}>
             But it&apos;s not
             <br />

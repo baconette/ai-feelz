@@ -7,12 +7,14 @@ const VALUES: LikertValue[] = [1, 2, 3, 4, 5]
 export function LikertControl({
   value,
   onChange,
+  className = '',
 }: {
   value: LikertValue | null
   onChange: (value: LikertValue) => void
+  className?: string
 }) {
   return (
-    <div className="grid grid-cols-5 gap-2">
+    <div className={`grid grid-cols-5 gap-2 ${className}`}>
       {VALUES.map((v) => (
         <button
           key={v}

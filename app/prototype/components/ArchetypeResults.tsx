@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DomainAverageSlider } from './DomainAverageSlider'
+import { DOMAIN_COLORS, DEFAULT_DOMAIN_TEXT_CLASSES } from '@/lib/prototype/domain-colors'
 
 type FriendState = 'idle' | 'form' | 'active'
 
@@ -58,10 +59,10 @@ export function ArchetypeResults({
         <CardDescription className="mx-auto max-w-sm">{result.summary}</CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6 py-6">
         <div className="flex items-center justify-between">
           <p className="text-xs font-base text-muted-foreground">
-            Based on {result.ratingCount} answers
+            Your average across {result.ratingCount} answers
           </p>
           <button
             type="button"
@@ -72,10 +73,14 @@ export function ArchetypeResults({
           </button>
         </div>
 
-        <div className="mb-12 space-y-6 text-left">
+        <div className="mb-12 space-y-8 text-left">
           {result.domainScores.map((d) => (
             <div key={d.domainId}>
-              <div className="mb-2 text-xs font-base text-foreground">{d.domainName}</div>
+              <div
+                className={`mb-2 text-xs font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
+              >
+                {d.domainName}
+              </div>
               <DomainAverageSlider
                 average={d.average}
                 friendAverage={
@@ -89,7 +94,13 @@ export function ArchetypeResults({
           ))}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-4 text-xs font-base text-muted-foreground">
+          <span>😃 You</span>
+          <span>✌️ Your Friend</span>
+          {hasAggregateThreshold && <span>🫥 Visitor average</span>}
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3 pt-4">
           <Button type="button" onClick={handleToggleFriend}>
             {friendState === 'idle' ? '✌️ Compare to friend' : 'Hide friend'}
           </Button>
@@ -131,7 +142,7 @@ export function ArchetypeResults({
         <button
           type="button"
           onClick={onRestart}
-          className="text-xs font-base text-muted-foreground underline"
+          className="pt-4 text-xs font-base text-muted-foreground underline"
         >
           Start over
         </button>
