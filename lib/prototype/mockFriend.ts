@@ -1,3 +1,10 @@
+import {
+  MIN_RATINGS_PER_DOMAIN,
+  deriveStandoutArchetype,
+  type DomainScore,
+  type StandoutArchetype,
+} from './archetypes'
+
 /**
  * Seeded fake "friend" dataset for the prototype's friend-comparison tab.
  * Any permalink code is accepted here — there's no real backend behind this yet.
@@ -26,3 +33,20 @@ export function mockFriendForDomain(domainName: string): number {
 }
 
 export const MOCK_FRIEND_OVERALL_AVERAGE = 3.8
+
+/**
+ * Derives the mock friend's own archetype from their domain averages, using the
+ * same standout-selection rules as a real visitor's result (see
+ * lib/prototype/archetypes.ts) so the two stay consistent.
+ */
+export function mockFriendArchetype(): StandoutArchetype {
+  const domainScores: DomainScore[] = Object.entries(MOCK_FRIEND_DOMAIN_AVERAGES).map(
+    ([domainName, average]) => ({
+      domainId: domainName,
+      domainName,
+      average,
+      count: MIN_RATINGS_PER_DOMAIN,
+    })
+  )
+  return deriveStandoutArchetype(domainScores)
+}

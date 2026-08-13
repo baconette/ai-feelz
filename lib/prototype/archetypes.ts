@@ -231,6 +231,94 @@ export const BLANK_SLATE: ArchetypeCopy = {
     "You haven't rated enough across different domains yet for a clear lean to show — keep going and we'll find where you stand out.",
 }
 
+/**
+ * One emoji per archetype headline, mirroring the Icon column of the Notion
+ * "Archetype Set" database (warm/cool archetypes for the same domain share an
+ * icon there, so they do here too).
+ */
+export const ARCHETYPE_ICONS: Record<string, string> = {
+  'The Trusting Patient': '🚑',
+  'The Second Opinion': '🚑',
+  'The Open Ledger': '💰',
+  'The Penny Pincher': '💰',
+  'The Open Door': '🏠',
+  'The Private Room': '🏠',
+  'The Concierge': '🍿',
+  'The Do-Not-Disturb': '🍿',
+  'The Machine Whisperer': '🤖',
+  'The Uncanny Valley': '🤖',
+  'The Inbox Zero': '⏱️',
+  'The Slow Burn': '⏱️',
+  'The Cruise Control': '🚌',
+  'The Backseat Driver': '🚌',
+  'The Extra Credit': '📚',
+  'The Hall Monitor': '📚',
+  'The Open Case': '⚖️',
+  'The Fine Print': '⚖️',
+  'The Remix': '🎭',
+  'The Art Defender': '🎭',
+  [EVEN_KEEL.headline]: '🎯',
+  [BLANK_SLATE.headline]: '📄',
+}
+
+export interface StandoutArchetype {
+  kind: 'domain' | 'evenKeel' | 'blankSlate'
+  headline: string
+  summary: string
+  standoutDomainName?: string
+  direction?: Direction
+}
+
+/**
+ * Picks the standout archetype from a set of confident domain scores. Shared by
+ * the real scoring engine and the mock friend dataset so both stay consistent
+ * with the same deviation/tie-break rules.
+ */
+export function deriveStandoutArchetype(domainScores: DomainScore[]): StandoutArchetype {
+  // Fewer than 2 confident domains: deviation is undefined or trivially 0 by
+  // construction (a single domain's average *is* the overall average under
+  // equal-domain-weighting) — a coverage gap, not a real personality signal.
+  if (domainScores.length < 2) {
+    return { kind: 'blankSlate', headline: BLANK_SLATE.headline, summary: BLANK_SLATE.summary }
+  }
+
+  const overallAverage = domainScores.reduce((sum, d) => sum + d.average, 0) / domainScores.length
+
+  const deviations = domainScores.map((domain) => ({
+    domain,
+    deviation: domain.average - overallAverage,
+  }))
+
+  const maxAbsDeviation = Math.max(...deviations.map((d) => Math.abs(d.deviation)))
+
+  // Enough confident domains, but none diverges meaningfully from the baseline
+  // — a real, distinct profile, not a data gap.
+  if (maxAbsDeviation < MIN_STANDOUT_DEVIATION) {
+    return { kind: 'evenKeel', headline: EVEN_KEEL.headline, summary: EVEN_KEEL.summary }
+  }
+
+  // Standout = largest |deviation|; ties broken by higher rating count — more
+  // data behind the signal wins.
+  const standout = deviations.reduce((best, current) => {
+    const bestAbs = Math.abs(best.deviation)
+    const currentAbs = Math.abs(current.deviation)
+    if (currentAbs > bestAbs) return current
+    if (currentAbs === bestAbs && current.domain.count > best.domain.count) return current
+    return best
+  })
+
+  const direction: Direction = standout.deviation > 0 ? 'warm' : 'cool'
+  const archetype = DOMAIN_ARCHETYPES[standout.domain.domainName]?.[direction] ?? EVEN_KEEL
+
+  return {
+    kind: 'domain',
+    standoutDomainName: standout.domain.domainName,
+    direction,
+    headline: archetype.headline,
+    summary: archetype.summary,
+  }
+}
+
 export function computeArchetype(
   ratings: RatingsMap,
   useCases: NotionUseCase[],
@@ -263,7 +351,7 @@ export function computeArchetype(
       average: domainSum / domainCount,
       count: domainCount,
     }))
-    .sort((a, b) => b.average - a.average)
+    .sort((a, b) => a.average - b.average)
 
   // Equal-domain-weight: average the domain averages, not the raw ratings, so a
   // domain the random bundle happened to serve more often doesn't dominate the
@@ -281,45 +369,5 @@ export function computeArchetype(
 
   const base = { levelBadge, polarizationBadge, overallAverage, ratingCount, domainScores }
 
-  // Fewer than 2 confident domains: deviation is undefined or trivially 0 by
-  // construction (a single domain's average *is* the overall average under
-  // equal-domain-weighting) — a coverage gap, not a real personality signal.
-  if (domainScores.length < 2) {
-    return { ...base, kind: 'blankSlate', headline: BLANK_SLATE.headline, summary: BLANK_SLATE.summary }
-  }
-
-  const deviations = domainScores.map((domain) => ({
-    domain,
-    deviation: domain.average - overallAverage,
-  }))
-
-  const maxAbsDeviation = Math.max(...deviations.map((d) => Math.abs(d.deviation)))
-
-  // Enough confident domains, but none diverges meaningfully from the visitor's
-  // own baseline — a real, distinct profile, not a data gap.
-  if (maxAbsDeviation < MIN_STANDOUT_DEVIATION) {
-    return { ...base, kind: 'evenKeel', headline: EVEN_KEEL.headline, summary: EVEN_KEEL.summary }
-  }
-
-  // Standout = largest |deviation|; ties broken by higher rating count — more
-  // data behind the signal wins.
-  const standout = deviations.reduce((best, current) => {
-    const bestAbs = Math.abs(best.deviation)
-    const currentAbs = Math.abs(current.deviation)
-    if (currentAbs > bestAbs) return current
-    if (currentAbs === bestAbs && current.domain.count > best.domain.count) return current
-    return best
-  })
-
-  const direction: Direction = standout.deviation > 0 ? 'warm' : 'cool'
-  const archetype = DOMAIN_ARCHETYPES[standout.domain.domainName]?.[direction] ?? EVEN_KEEL
-
-  return {
-    ...base,
-    kind: 'domain',
-    standoutDomainName: standout.domain.domainName,
-    direction,
-    headline: archetype.headline,
-    summary: archetype.summary,
-  }
+  return { ...base, ...deriveStandoutArchetype(domainScores) }
 }
