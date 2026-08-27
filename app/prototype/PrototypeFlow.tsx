@@ -81,7 +81,7 @@ export function PrototypeFlow({
   }
 
   return (
-    <div className="relative isolate ml-20 max-w-lg px-4 pt-16 pb-10">
+    <div className="relative isolate mx-auto lg:mx-0 lg:ml-20 max-w-[33rem] px-4 pt-16 pb-10">
       <div
         className="fixed inset-0 z-0 bg-cover bg-center"
         style={{ backgroundImage: "url('/legal/justice1.gif')" }}

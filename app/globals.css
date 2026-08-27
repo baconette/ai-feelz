@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --border-radius: 5px;
+  --border-radius: 15px;
   --box-shadow-x: 2px;
   --box-shadow-y: 2px;
   --reverse-box-shadow-x: -2px;

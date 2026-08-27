@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import type { ArchetypeResult } from '@/lib/prototype/archetypes'
-import { mockFriendForDomain } from '@/lib/prototype/mockFriend'
+import { mockFriendForDomain, mockFriendArchetype } from '@/lib/prototype/mockFriend'
 import { mockAggregateForDomain } from '@/lib/prototype/mockAggregate'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DomainAverageSlider } from './DomainAverageSlider'
+import { ArchetypeCard } from './ArchetypeCard'
+import { DOMAIN_COLORS, DEFAULT_DOMAIN_TEXT_CLASSES } from '@/lib/prototype/domain-colors'
 
 type FriendState = 'idle' | 'form' | 'active'
 
@@ -50,18 +52,37 @@ export function ArchetypeResults({
     navigator.clipboard?.writeText(url).catch(() => {})
   }
 
+  const friend = friendState === 'active' ? mockFriendArchetype() : null
+
   return (
     <Card className="text-center">
       <CardHeader className="items-center">
-        <div className="mx-auto mb-2 h-14 w-14 rounded-full border-2 border-dashed border-border" />
-        <CardTitle className="text-xl">{result.headline}</CardTitle>
-        <CardDescription className="mx-auto max-w-sm">{result.summary}</CardDescription>
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
+          <ArchetypeCard
+            headline={result.headline}
+            summary={result.summary}
+            domainName={result.standoutDomainName}
+            label={friend ? 'You' : undefined}
+            layout={friend ? 'stacked' : 'horizontal'}
+            className="flex-1"
+          />
+          {friend && (
+            <ArchetypeCard
+              headline={friend.headline}
+              summary={friend.summary}
+              domainName={friend.standoutDomainName}
+              label="Your Friend"
+              layout="stacked"
+              className="flex-1"
+            />
+          )}
+        </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6 py-6">
         <div className="flex items-center justify-between">
           <p className="text-xs font-base text-muted-foreground">
-            Based on {result.ratingCount} answers
+            Your average across {result.ratingCount} answers
           </p>
           <button
             type="button"
@@ -72,10 +93,19 @@ export function ArchetypeResults({
           </button>
         </div>
 
-        <div className="mb-12 space-y-6 text-left">
+        <div className="flex items-center justify-between text-xl">
+          <span aria-hidden>🧠</span>
+          <span aria-hidden>🤖</span>
+        </div>
+
+        <div className="mb-12 !mt-2 space-y-10 text-left">
           {result.domainScores.map((d) => (
             <div key={d.domainId}>
-              <div className="mb-2 text-xs font-base text-foreground">{d.domainName}</div>
+              <div
+                className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
+              >
+                {d.domainName}
+              </div>
               <DomainAverageSlider
                 average={d.average}
                 friendAverage={
@@ -89,7 +119,13 @@ export function ArchetypeResults({
           ))}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-4 pt-4 text-xs font-base text-muted-foreground">
+          <span>😃 You</span>
+          {friendState === 'active' && <span>✌️ Your Friend</span>}
+          {hasAggregateThreshold && <span>🫥 Visitor average</span>}
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-3 pt-4">
           <Button type="button" onClick={handleToggleFriend}>
             {friendState === 'idle' ? '✌️ Compare to friend' : 'Hide friend'}
           </Button>
@@ -131,7 +167,7 @@ export function ArchetypeResults({
         <button
           type="button"
           onClick={onRestart}
-          className="text-xs font-base text-muted-foreground underline"
+          className="pt-4 text-xs font-base text-muted-foreground underline"
         >
           Start over
         </button>

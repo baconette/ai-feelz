@@ -88,7 +88,7 @@ export function UseCaseCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="py-4">
         <p className="text-base font-heading text-foreground sm:text-lg">
           {prefix}
           <span
@@ -98,7 +98,7 @@ export function UseCaseCard({
           </span>
         </p>
 
-        <div className="-mt-2">
+        <div className="mt-1">
           <button
             type="button"
             onClick={() => setShowExplanation((prev) => !prev)}
@@ -114,11 +114,11 @@ export function UseCaseCard({
           )}
         </div>
 
-        <LikertControl value={value} onChange={setValue} />
+        <LikertControl value={value} onChange={setValue} className="mt-16" />
       </CardContent>
 
       <CardFooter className="justify-end">
-        <Button type="button" variant="neutral" onClick={handleNext} disabled={value === null}>
+        <Button type="button" onClick={handleNext} disabled={value === null}>
           Next
         </Button>
       </CardFooter>
