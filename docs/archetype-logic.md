@@ -9,7 +9,7 @@ Scoring model for the AI-attitude archetype shown to visitors: which of 22 arche
 
 ## The model
 
-**5-point Likert scale**: Never (1) · Some (2) · Neutral (3) · Most (4) · Always (5).
+**4-point Likert scale**: Never (1) · Some (2) · Most (3) · Always (4).
 
 **10 domains × 2 directions (warm/cool) = 20 domain archetypes, plus 2 catch-alls (Even Keel, Blank Slate) = 22 total.** Warm and cool get fully distinct names per domain (not one name with branching copy) — sharper, more specific copy per direction.
 
@@ -24,7 +24,7 @@ Scoring model for the AI-attitude archetype shown to visitors: which of 22 arche
    - Otherwise, standout domain = the one with the largest `|deviation|`. **Tie-break**: equal/near-equal `|deviation|` goes to the domain with the higher rating count. (Tie-break only decides between two already-close domains — it's a separate, narrow mechanism from whether a deviation crosses the standout threshold at all.)
 5. **Direction & naming** — `sign(deviation_standout)` picks the domain's warm name (`> 0`) or cool name (`< 0`).
 
-**Worked example**: Healthcare `[4, 5, 4]` (avg 4.33), Mobility `[2, 1]` (avg 1.5), Finances `[3]` (n=1, excluded), Education `[3, 4, 3, 3]` (avg 3.25). Own baseline = `(4.33 + 1.5 + 3.25) / 3 = 3.03`. Deviations: Healthcare +1.30, Mobility −1.53, Education +0.22. Standout = Mobility (cool) → **The Backseat Driver**.
+**Worked example**: Healthcare `[4, 4, 3]` (avg 3.67), Mobility `[2, 1]` (avg 1.5), Finances `[3]` (n=1, excluded), Education `[3, 4, 3, 3]` (avg 3.25). Own baseline = `(3.67 + 1.5 + 3.25) / 3 = 2.81`. Deviations: Healthcare +0.86, Mobility −1.31, Education +0.44. Standout = Mobility (cool) → **The Backseat Driver**.
 
 **Archetype set (22 total)**
 

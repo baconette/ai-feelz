@@ -7,25 +7,25 @@
 export const MOCK_RESPONDENT_COUNT = 128
 export const MOCK_RESPONSE_THRESHOLD = 25
 
-// Rescaled from the original 1–4 mock values to 1–5 (see the Likert scale
-// migration in docs/sprint-archetype-logic.md), preserving relative position.
+// Rescaled from the 1–5 mock values back down to 1–4 (see the Likert scale
+// migration in docs/archetype-logic.md), preserving relative position.
 const MOCK_DOMAIN_AVERAGES: Record<string, number> = {
-  Healthcare: 2.7,
-  Finances: 2.5,
-  'Home & Personal Life': 3.4,
-  'Leisure & Hospitality': 3.8,
-  Robotics: 2.9,
-  Productivity: 4.1,
-  Mobility: 3.1,
-  Education: 3.3,
-  'Legal & Public Services': 2.6,
-  'Media & Culture': 3.0,
+  Healthcare: 2.3,
+  Finances: 2.1,
+  'Home & Personal Life': 2.8,
+  'Leisure & Hospitality': 3.1,
+  Robotics: 2.4,
+  Productivity: 3.3,
+  Mobility: 2.6,
+  Education: 2.7,
+  'Legal & Public Services': 2.2,
+  'Media & Culture': 2.5,
 }
 
-const DEFAULT_MOCK_AVERAGE = 3.1
+const DEFAULT_MOCK_AVERAGE = 2.6
 
 export function mockAggregateForDomain(domainName: string): number {
   return MOCK_DOMAIN_AVERAGES[domainName] ?? DEFAULT_MOCK_AVERAGE
 }
 
-export const MOCK_OVERALL_AVERAGE = 3.07
+export const MOCK_OVERALL_AVERAGE = 2.55

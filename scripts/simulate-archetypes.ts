@@ -82,12 +82,12 @@ function run(label: string, profile: Partial<Record<string, LikertValue[]>>) {
 console.log('--- Named test cases ---\n')
 
 run('Blank Slate (n=1 domain)', {
-  Healthcare: [4, 5, 4],
+  Healthcare: [4, 4, 3],
   Finances: [3], // below MIN_RATINGS_PER_DOMAIN, excluded — only Healthcare is confident
 })
 
 run('Worked example (doc)', {
-  Healthcare: [4, 5, 4],
+  Healthcare: [4, 4, 3],
   Mobility: [2, 1],
   Finances: [3], // excluded
   Education: [3, 4, 3, 3],
@@ -103,27 +103,27 @@ run('Even Keel (flat, dense)', {
 run('Sparse (one bundle, 7 ratings)', {
   Healthcare: [4, 3],
   Mobility: [2],
-  Education: [5],
+  Education: [4],
   Robotics: [1],
   Productivity: [3],
   Finances: [4],
 })
 
 run('Dense (multiple bundles)', {
-  Healthcare: [5, 5, 4, 5, 4],
+  Healthcare: [4, 4, 3, 4, 4],
   Finances: [2, 3, 2, 2],
   'Home & Personal Life': [4, 3, 4],
-  'Leisure & Hospitality': [5, 4, 5],
+  'Leisure & Hospitality': [4, 3, 4],
   Robotics: [3, 2, 3],
   Productivity: [4, 4, 3],
   Mobility: [2, 2, 1],
   Education: [3, 4, 3],
   'Legal & Public Services': [2, 3, 2],
-  'Media & Culture': [4, 4, 5],
+  'Media & Culture': [4, 4, 3],
 })
 
 run('Polarized (Never/Always split)', {
-  Healthcare: [1, 1, 5, 5, 1, 1, 5],
+  Healthcare: [1, 1, 4, 4, 1, 1, 4],
   Finances: [3, 3],
 })
 
@@ -134,10 +134,10 @@ run('Consistent (all mid, low variance)', {
 })
 
 run('Tie-break (equal |deviation|, unequal n)', {
-  // overall = (4.5 + 1.5 + 3) / 3 = 3.0; Healthcare +1.5 (n=2), Mobility -1.5 (n=3)
-  Healthcare: [4, 5],
-  Mobility: [2, 1, 1],
-  Education: [3, 3],
+  // overall = (4 + 1 + 2.5) / 3 = 2.5; Healthcare +1.5 (n=2), Mobility -1.5 (n=3)
+  Healthcare: [4, 4],
+  Mobility: [1, 1, 1],
+  Education: [2, 3],
 })
 
 // ---------------------------------------------------------------------------
@@ -152,17 +152,17 @@ function gaussian(sigma: number): number {
 }
 
 function clampLikert(x: number): LikertValue {
-  return Math.min(5, Math.max(1, Math.round(x))) as LikertValue
+  return Math.min(4, Math.max(1, Math.round(x))) as LikertValue
 }
 
 /**
  * A "no true domain preference" visitor: one personal baseline `mu`, and every
  * individual rating in every domain is `mu` plus noise — domains are
  * interchangeable, so any deviation that shows up is pure sampling noise.
- * Noise sigma is an assumption (0.8 on the 1-5 scale), not derived from data.
+ * Noise sigma is an assumption (0.8 on the 1-4 scale), not derived from data.
  */
 function simulateNullVisitor(domainCount: number, ratingsPerDomain: number, sigma: number) {
-  const mu = 1 + Math.random() * 4 // uniform personal baseline in [1, 5]
+  const mu = 1 + Math.random() * 3 // uniform personal baseline in [1, 4]
   const domainAverages: number[] = []
 
   for (let d = 0; d < domainCount; d++) {
@@ -184,7 +184,7 @@ function percentile(sorted: number[], p: number): number {
 }
 
 console.log('\n--- Noise floor: maxAbsDeviation for a visitor with NO real domain preference ---')
-console.log('(assumption: per-rating noise sigma = 0.8 on the 1-5 scale; personal baseline mu ~ U(1,5))\n')
+console.log('(assumption: per-rating noise sigma = 0.8 on the 1-4 scale; personal baseline mu ~ U(1,4))\n')
 
 const TRIALS = 5000
 const SIGMA = 0.8

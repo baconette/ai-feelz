@@ -11,28 +11,28 @@ import {
  * Replace with a real lookup once shared results actually persist somewhere.
  */
 
-// Rescaled from the original 1–4 mock values to 1–5 (see the Likert scale
-// migration in docs/sprint-archetype-logic.md), preserving relative position.
+// Rescaled from the 1–5 mock values back down to 1–4 (see the Likert scale
+// migration in docs/archetype-logic.md), preserving relative position.
 const MOCK_FRIEND_DOMAIN_AVERAGES: Record<string, number> = {
-  Healthcare: 4.2,
-  Finances: 2.3,
-  'Home & Personal Life': 4.5,
-  'Leisure & Hospitality': 4.7,
-  Robotics: 3.5,
-  Productivity: 4.3,
-  Mobility: 2.6,
-  Education: 3.7,
-  'Legal & Public Services': 2.1,
-  'Media & Culture': 4.1,
+  Healthcare: 3.4,
+  Finances: 2.0,
+  'Home & Personal Life': 3.6,
+  'Leisure & Hospitality': 3.8,
+  Robotics: 2.9,
+  Productivity: 3.5,
+  Mobility: 2.2,
+  Education: 3.0,
+  'Legal & Public Services': 1.8,
+  'Media & Culture': 3.3,
 }
 
-const DEFAULT_MOCK_FRIEND_AVERAGE = 3.5
+const DEFAULT_MOCK_FRIEND_AVERAGE = 2.9
 
 export function mockFriendForDomain(domainName: string): number {
   return MOCK_FRIEND_DOMAIN_AVERAGES[domainName] ?? DEFAULT_MOCK_FRIEND_AVERAGE
 }
 
-export const MOCK_FRIEND_OVERALL_AVERAGE = 3.8
+export const MOCK_FRIEND_OVERALL_AVERAGE = 3.1
 
 /**
  * Derives the mock friend's own archetype from their domain averages, using the

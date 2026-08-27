@@ -29,7 +29,7 @@ export interface ArchetypeResult {
  * or appears in the domain breakdown — otherwise a single noisy rating (the common
  * case, since a 7-card bundle rarely touches the same domain twice) would stand in
  * for a whole domain. This is a count, not a scale value, so it isn't affected by
- * the 4→5-point migration — but is worth re-tuning anyway now that domain averages
+ * the 5→4-point migration — but is worth re-tuning anyway now that domain averages
  * feed a deviation calculation, which amplifies low-n noise more than plain
  * averaging did. See docs/sprint-archetype-logic.md.
  */
@@ -45,14 +45,14 @@ export const MIN_RATINGS_PER_DOMAIN = 2
 export const MIN_STANDOUT_DEVIATION = 0.3
 
 /**
- * 5-point level badge, bucketing the visitor's own overall average. Boundaries are
- * a first pass (even split across the 1–5 range) pending real-data validation.
+ * 4-point level badge, bucketing the visitor's own overall average. Boundaries are
+ * a first pass (even split across the 1–4 range) pending real-data validation.
  */
 const LEVELS: { max: number; label: string }[] = [
-  { max: 1.8, label: 'Sus' },
-  { max: 2.6, label: 'Cautious' },
-  { max: 3.4, label: 'Neutral' },
-  { max: 4.2, label: 'Curious' },
+  { max: 1.6, label: 'Sus' },
+  { max: 2.2, label: 'Cautious' },
+  { max: 2.8, label: 'Neutral' },
+  { max: 3.4, label: 'Curious' },
   { max: Infinity, label: 'Bet' },
 ]
 
@@ -64,12 +64,12 @@ function pickLevel(average: number): string {
  * Polarization badge: runs on raw individual ratings, not the equal-domain-weighted
  * average, since domain-averaging can hide real bimodality (e.g. a domain with one
  * Never and one Always nets to a domain average that erases the extremes). Poles
- * redefined as 1 and 5 for the 5-point scale; the count/share/shape-check constants
- * carry over unchanged from the 4-point proposal as placeholders — not yet
+ * redefined as 1 and 4 for the 4-point scale; the count/share/shape-check constants
+ * carry over unchanged from the 5-point version as placeholders — not yet
  * re-validated. See docs/sprint-archetype-logic.md.
  */
 const POLE_LOW = 1
-const POLE_HIGH = 5
+const POLE_HIGH = 4
 const MIN_POLE_COUNT = 2
 const MIN_POLE_SHARE = 0.15
 const MIN_RATINGS_FOR_SHAPE_CHECK = 7

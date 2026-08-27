@@ -9,7 +9,7 @@ import {
   DEFAULT_DOMAIN_BADGE_CLASSES,
   DEFAULT_DOMAIN_SENTENCE_UNDERLINE_CLASSES,
 } from '@/lib/prototype/domain-colors'
-import { LikertControl } from './LikertControl'
+import { LikertSlider } from './LikertSlider'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -44,11 +44,11 @@ export function UseCaseCard({
   onSubmit: (rating: Rating) => void
   onBack: () => void
 }) {
-  const [value, setValue] = useState<LikertValue | null>(initialRating?.value ?? null)
+  const [value, setValue] = useState<LikertValue>(initialRating?.value ?? 1)
   const [showExplanation, setShowExplanation] = useState(false)
 
   useEffect(() => {
-    setValue(initialRating?.value ?? null)
+    setValue(initialRating?.value ?? 1)
     setShowExplanation(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useCase.notionId])
@@ -57,7 +57,6 @@ export function UseCaseCard({
   const { prefix, rest } = splitSentence(useCase.useCase)
 
   function handleNext() {
-    if (value === null) return
     onSubmit({ value })
   }
 
@@ -65,7 +64,7 @@ export function UseCaseCard({
     <Card>
       <CardHeader className="gap-3">
         <Progress
-          value={(index / total) * 100}
+          value={((index - 1) / total) * 100}
           className="h-2 border-2 border-muted-foreground bg-secondary-background"
           indicatorClassName="border-none bg-muted-foreground"
         />
@@ -114,11 +113,11 @@ export function UseCaseCard({
           )}
         </div>
 
-        <LikertControl value={value} onChange={setValue} className="mt-16" />
+        <LikertSlider value={value} onChange={setValue} className="mt-16" />
       </CardContent>
 
       <CardFooter className="justify-end">
-        <Button type="button" onClick={handleNext} disabled={value === null}>
+        <Button type="button" onClick={handleNext}>
           Next
         </Button>
       </CardFooter>
