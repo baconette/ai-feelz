@@ -11,28 +11,30 @@ import {
  * Replace with a real lookup once shared results actually persist somewhere.
  */
 
-// Rescaled from the original 1–4 mock values to 1–5 (see the Likert scale
-// migration in docs/sprint-archetype-logic.md), preserving relative position.
+// Robotics is set well above the rest so it clears the 10-domain standout
+// threshold (see STANDOUT_THRESHOLD_BY_DOMAIN_COUNT in archetypes.ts) and
+// resolves to The Machine Whisperer — every other domain stays close enough
+// to the mean that none of them competes as an alternate standout.
 const MOCK_FRIEND_DOMAIN_AVERAGES: Record<string, number> = {
-  Healthcare: 4.2,
-  Finances: 2.3,
-  'Home & Personal Life': 4.5,
-  'Leisure & Hospitality': 4.7,
-  Robotics: 3.5,
-  Productivity: 4.3,
-  Mobility: 2.6,
-  Education: 3.7,
+  Healthcare: 2.3,
+  Finances: 2.6,
+  'Home & Personal Life': 2.5,
+  'Leisure & Hospitality': 2.8,
+  Robotics: 4.0,
+  Productivity: 2.4,
+  Mobility: 2.2,
+  Education: 2.7,
   'Legal & Public Services': 2.1,
-  'Media & Culture': 4.1,
+  'Media & Culture': 2.5,
 }
 
-const DEFAULT_MOCK_FRIEND_AVERAGE = 3.5
+const DEFAULT_MOCK_FRIEND_AVERAGE = 2.6
 
 export function mockFriendForDomain(domainName: string): number {
   return MOCK_FRIEND_DOMAIN_AVERAGES[domainName] ?? DEFAULT_MOCK_FRIEND_AVERAGE
 }
 
-export const MOCK_FRIEND_OVERALL_AVERAGE = 3.8
+export const MOCK_FRIEND_OVERALL_AVERAGE = 2.61
 
 /**
  * Derives the mock friend's own archetype from their domain averages, using the

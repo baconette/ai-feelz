@@ -17,8 +17,6 @@ export interface ArchetypeResult {
   kind: 'domain' | 'evenKeel' | 'blankSlate'
   standoutDomainName?: string
   direction?: Direction
-  levelBadge: string
-  polarizationBadge: 'Steady' | 'Polarized'
   overallAverage: number
   ratingCount: number
   domainScores: DomainScore[]
@@ -28,67 +26,52 @@ export interface ArchetypeResult {
  * A domain needs at least this many ratings before it counts toward the archetype
  * or appears in the domain breakdown — otherwise a single noisy rating (the common
  * case, since a 7-card bundle rarely touches the same domain twice) would stand in
- * for a whole domain. This is a count, not a scale value, so it isn't affected by
- * the 4→5-point migration — but is worth re-tuning anyway now that domain averages
- * feed a deviation calculation, which amplifies low-n noise more than plain
- * averaging did. See docs/sprint-archetype-logic.md.
+ * for a whole domain. This is a count, not a scale value, so the 5→4-point scale
+ * migration didn't affect it. Re-derivation (scripts/simulate-archetypes.ts)
+ * concluded this should stay at 2: raising it to 3 or 4 only marginally reduces
+ * false standouts (e.g. at 10 domains, 98%→96%) — confident-domain COUNT is the
+ * dominant driver of noise, not ratings-per-domain, so that's what
+ * STANDOUT_THRESHOLD_BY_DOMAIN_COUNT below is indexed on instead. See
+ * docs/archetype-logic.md.
  */
 export const MIN_RATINGS_PER_DOMAIN = 2
 
 /**
  * Minimum |deviation| (a confident domain's average vs. the visitor's own overall
  * average) required to treat that domain as a real standout rather than sampling
- * noise. Placeholder pending the synthetic-data simulation described in
- * docs/sprint-archetype-logic.md — not yet validated against real or simulated
- * distributions.
+ * noise, indexed by confident-domain count. A single flat number is wrong for
+ * everyone: the noise floor (how large maxAbsDeviation gets for a visitor with NO
+ * real domain preference, by chance alone) scales with how many domains they've
+ * rated, since it's a max over more samples. Each value is the smallest threshold
+ * (searched in 0.01 steps) whose simulated false-positive rate — the share of
+ * no-preference visitors who'd still get a domain archetype instead of The Even
+ * Keel — is ≤10%, from a 300k-trial synthetic simulation at
+ * MIN_RATINGS_PER_DOMAIN ratings/domain (real rates land 6–9.5%: low domain
+ * counts have few achievable deviation values, so a plain percentile lookup can
+ * land mid-gap and overshoot the target badly — searching directly for the rate
+ * avoids that). Monotonic non-decreasing by construction, so more domains never
+ * requires a *lower* bar than fewer. See scripts/simulate-archetypes.ts and
+ * docs/archetype-logic.md.
  */
-export const MIN_STANDOUT_DEVIATION = 0.3
-
-/**
- * 5-point level badge, bucketing the visitor's own overall average. Boundaries are
- * a first pass (even split across the 1–5 range) pending real-data validation.
- */
-const LEVELS: { max: number; label: string }[] = [
-  { max: 1.8, label: 'Sus' },
-  { max: 2.6, label: 'Cautious' },
-  { max: 3.4, label: 'Neutral' },
-  { max: 4.2, label: 'Curious' },
-  { max: Infinity, label: 'Bet' },
-]
-
-function pickLevel(average: number): string {
-  return (LEVELS.find((level) => average <= level.max) ?? LEVELS[LEVELS.length - 1]).label
+const STANDOUT_THRESHOLD_BY_DOMAIN_COUNT: Record<number, number> = {
+  2: 0.6,
+  3: 0.9,
+  4: 1.05,
+  5: 1.15,
+  6: 1.15,
+  7: 1.18,
+  8: 1.22,
+  9: 1.26,
+  10: 1.29,
 }
 
-/**
- * Polarization badge: runs on raw individual ratings, not the equal-domain-weighted
- * average, since domain-averaging can hide real bimodality (e.g. a domain with one
- * Never and one Always nets to a domain average that erases the extremes). Poles
- * redefined as 1 and 5 for the 5-point scale; the count/share/shape-check constants
- * carry over unchanged from the 4-point proposal as placeholders — not yet
- * re-validated. See docs/sprint-archetype-logic.md.
- */
-const POLE_LOW = 1
-const POLE_HIGH = 5
-const MIN_POLE_COUNT = 2
-const MIN_POLE_SHARE = 0.15
-const MIN_RATINGS_FOR_SHAPE_CHECK = 7
+const MAX_INDEXED_DOMAIN_COUNT = Math.max(
+  ...Object.keys(STANDOUT_THRESHOLD_BY_DOMAIN_COUNT).map(Number)
+)
 
-function pickPolarization(ratings: RatingsMap): 'Steady' | 'Polarized' {
-  const values = Object.values(ratings).map((rating) => rating.value)
-  const total = values.length
-  if (total < MIN_RATINGS_FOR_SHAPE_CHECK) return 'Steady'
-
-  const lowCount = values.filter((value) => value === POLE_LOW).length
-  const highCount = values.filter((value) => value === POLE_HIGH).length
-
-  const isPolarized =
-    lowCount >= MIN_POLE_COUNT &&
-    lowCount / total >= MIN_POLE_SHARE &&
-    highCount >= MIN_POLE_COUNT &&
-    highCount / total >= MIN_POLE_SHARE
-
-  return isPolarized ? 'Polarized' : 'Steady'
+export function getStandoutThreshold(confidentDomainCount: number): number {
+  const clamped = Math.min(Math.max(confidentDomainCount, 2), MAX_INDEXED_DOMAIN_COUNT)
+  return STANDOUT_THRESHOLD_BY_DOMAIN_COUNT[clamped]
 }
 
 interface ArchetypeCopy {
@@ -293,7 +276,7 @@ export function deriveStandoutArchetype(domainScores: DomainScore[]): StandoutAr
 
   // Enough confident domains, but none diverges meaningfully from the baseline
   // — a real, distinct profile, not a data gap.
-  if (maxAbsDeviation < MIN_STANDOUT_DEVIATION) {
+  if (maxAbsDeviation < getStandoutThreshold(domainScores.length)) {
     return { kind: 'evenKeel', headline: EVEN_KEEL.headline, summary: EVEN_KEEL.summary }
   }
 
@@ -364,10 +347,7 @@ export function computeArchetype(
         ? rawSum / ratingCount
         : 0
 
-  const levelBadge = pickLevel(overallAverage)
-  const polarizationBadge = pickPolarization(ratings)
-
-  const base = { levelBadge, polarizationBadge, overallAverage, ratingCount, domainScores }
+  const base = { overallAverage, ratingCount, domainScores }
 
   return { ...base, ...deriveStandoutArchetype(domainScores) }
 }

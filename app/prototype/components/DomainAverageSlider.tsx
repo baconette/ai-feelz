@@ -29,7 +29,7 @@ export function DomainAverageSlider({
   average,
   friendAverage,
   othersAverage,
-  max = 5,
+  max = 4,
 }: {
   average: number
   friendAverage?: number
