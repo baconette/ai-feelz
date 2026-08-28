@@ -88,7 +88,7 @@ export function UseCaseCard({
       </CardHeader>
 
       <CardContent className="py-4">
-        <p className="text-base font-heading text-foreground sm:text-lg">
+        <p className="text-lg font-heading text-foreground">
           {prefix}
           <span
             className={`underline decoration-4 underline-offset-4 ${DOMAIN_COLORS[domainName]?.sentenceUnderline ?? DEFAULT_DOMAIN_SENTENCE_UNDERLINE_CLASSES}`}

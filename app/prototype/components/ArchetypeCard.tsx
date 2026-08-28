@@ -29,7 +29,7 @@ export function ArchetypeCard({
   const icon = ARCHETYPE_ICONS[headline] ?? '❔'
 
   const avatar = (
-    <div className="flex h-[5.5rem] w-[5.5rem] shrink-0 items-center justify-center rounded-full bg-white text-[3rem]">
+    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-[2rem] sm:h-[5.5rem] sm:w-[5.5rem] sm:text-[3rem]">
       <span aria-hidden>{icon}</span>
     </div>
   )
@@ -38,15 +38,15 @@ export function ArchetypeCard({
     return (
       <div
         className={cn(
-          'flex w-full items-center gap-4 rounded-base border-2 border-border p-5 text-left shadow-shadow',
+          'flex w-full items-center gap-2 rounded-base border-2 border-border p-3 text-left shadow-shadow sm:gap-4 sm:p-5',
           colorClasses,
           className
         )}
       >
         {avatar}
-        <div className="flex flex-col gap-1">
+        <div className="flex min-w-0 flex-col gap-1">
           {label && <span className="text-xs font-base uppercase tracking-wide opacity-70">{label}</span>}
-          <p className="font-heading text-lg">{headline}</p>
+          <p className="font-heading text-base sm:text-lg">{headline}</p>
           {summary && <p className="text-xs font-base opacity-80">{summary}</p>}
         </div>
       </div>
@@ -56,14 +56,14 @@ export function ArchetypeCard({
   return (
     <div
       className={cn(
-        'flex flex-col items-center gap-2 rounded-base border-2 border-border p-5 text-center shadow-shadow',
+        'flex min-w-0 flex-col items-center gap-2 rounded-base border-2 border-border p-3 text-center shadow-shadow sm:p-5',
         colorClasses,
         className
       )}
     >
       {label && <span className="text-xs font-base uppercase tracking-wide opacity-70">{label}</span>}
       {avatar}
-      <p className="font-heading text-lg">{headline}</p>
+      <p className="font-heading text-base sm:text-lg">{headline}</p>
       {summary && <p className="text-xs font-base opacity-80">{summary}</p>}
     </div>
   )

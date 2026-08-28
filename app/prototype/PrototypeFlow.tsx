@@ -23,8 +23,10 @@ function shuffle<T>(items: T[]): T[] {
   return copy
 }
 
-function makeBundle(pool: NotionUseCase[]): NotionUseCase[] {
-  return shuffle(pool).slice(0, Math.min(BUNDLE_SIZE, pool.length))
+function makeBundle(pool: NotionUseCase[], ratings: RatingsMap): NotionUseCase[] {
+  const unrated = pool.filter((useCase) => !(useCase.notionId in ratings))
+  const source = unrated.length > 0 ? unrated : pool
+  return shuffle(source).slice(0, Math.min(BUNDLE_SIZE, source.length))
 }
 
 export function PrototypeFlow({
@@ -49,7 +51,7 @@ export function PrototypeFlow({
   )
 
   function startBundle() {
-    setBundle(makeBundle(useCases))
+    setBundle(makeBundle(useCases, ratings))
     setBundleIndex(0)
     setView('rating')
   }

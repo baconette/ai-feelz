@@ -54,10 +54,25 @@ export function ArchetypeResults({
 
   const friend = friendState === 'active' ? mockFriendArchetype() : null
 
+  const domainAgreement =
+    friendState === 'active'
+      ? [...result.domainScores]
+          .map((d) => ({
+            domainId: d.domainId,
+            domainName: d.domainName,
+            average: d.average,
+            friendAverage: mockFriendForDomain(d.domainName),
+            diff: Math.abs(d.average - mockFriendForDomain(d.domainName)),
+          }))
+          .sort((a, b) => a.diff - b.diff)
+      : []
+  const mostAgreed = domainAgreement.slice(0, 2)
+  const mostDisagreed = [...domainAgreement].reverse().slice(0, 2)
+
   return (
     <Card className="text-center">
       <CardHeader className="items-center">
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
+        <div className="flex w-full flex-row items-stretch gap-2 sm:gap-3">
           <ArchetypeCard
             headline={result.headline}
             summary={result.summary}
@@ -79,7 +94,7 @@ export function ArchetypeResults({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6 py-6">
+      <CardContent className="space-y-6 pb-6">
         <div className="flex items-center justify-between">
           <p className="text-xs font-base text-muted-foreground">
             Your average across {result.ratingCount} answers
@@ -93,31 +108,73 @@ export function ArchetypeResults({
           </button>
         </div>
 
-        <div className="flex items-center justify-between text-xl">
+        <div className="flex items-center justify-between text-4xl">
           <span aria-hidden>🧠</span>
           <span aria-hidden>🤖</span>
         </div>
 
-        <div className="mb-12 !mt-2 space-y-10 text-left">
-          {result.domainScores.map((d) => (
-            <div key={d.domainId}>
-              <div
-                className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
-              >
-                {d.domainName}
+        {friendState === 'active' && (
+          <div className="mb-12 space-y-6 text-left">
+            <div>
+              <p className="mb-4 text-base font-heading text-foreground">Where you agreed most</p>
+              <div className="space-y-10">
+                {mostAgreed.map((d) => (
+                  <div key={d.domainId}>
+                    <div
+                      className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
+                    >
+                      {d.domainName}
+                    </div>
+                    <DomainAverageSlider
+                      average={d.average}
+                      friendAverage={d.friendAverage}
+                      othersAverage={hasAggregateThreshold ? mockAggregateForDomain(d.domainName) : undefined}
+                    />
+                  </div>
+                ))}
               </div>
-              <DomainAverageSlider
-                average={d.average}
-                friendAverage={
-                  friendState === 'active' ? mockFriendForDomain(d.domainName) : undefined
-                }
-                othersAverage={
-                  hasAggregateThreshold ? mockAggregateForDomain(d.domainName) : undefined
-                }
-              />
             </div>
-          ))}
-        </div>
+            <div>
+              <p className="mb-4 text-base font-heading text-foreground">Where you disagree the most</p>
+              <div className="space-y-10">
+                {mostDisagreed.map((d) => (
+                  <div key={d.domainId}>
+                    <div
+                      className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
+                    >
+                      {d.domainName}
+                    </div>
+                    <DomainAverageSlider
+                      average={d.average}
+                      friendAverage={d.friendAverage}
+                      othersAverage={hasAggregateThreshold ? mockAggregateForDomain(d.domainName) : undefined}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {friendState !== 'active' && (
+          <div className="mb-12 !mt-2 space-y-10 text-left">
+            {result.domainScores.map((d) => (
+              <div key={d.domainId}>
+                <div
+                  className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
+                >
+                  {d.domainName}
+                </div>
+                <DomainAverageSlider
+                  average={d.average}
+                  othersAverage={
+                    hasAggregateThreshold ? mockAggregateForDomain(d.domainName) : undefined
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-4 text-xs font-base text-muted-foreground">
           <span>😃 You</span>

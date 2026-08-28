@@ -25,6 +25,7 @@ export function LikertSlider({
   const sliderWrapRef = useRef<HTMLDivElement>(null)
   const ticksRowRef = useRef<HTMLDivElement>(null)
   const [tickLefts, setTickLefts] = useState<number[] | null>(null)
+  const [trackTickLefts, setTrackTickLefts] = useState<number[] | null>(null)
 
   useIsomorphicLayoutEffect(() => {
     const wrap = sliderWrapRef.current
@@ -46,6 +47,7 @@ export function LikertSlider({
         const trackRect = track.getBoundingClientRect()
         const thumbRect = thumb.getBoundingClientRect()
         const rowRect = row!.getBoundingClientRect()
+        const wrapRect = wrap!.getBoundingClientRect()
 
         // Radix insets the thumb from the track's edges so it never overflows
         // (by how much depends on its own internal layout, not something we
@@ -59,13 +61,13 @@ export function LikertSlider({
             ? thumbRect.width / 2
             : (thumbCenter - trackRect.left - frac * trackRect.width) / (1 - 2 * frac)
 
-        setTickLefts(
-          VALUES.map((v) => {
-            const f = (v - MIN) / (MAX - MIN)
-            const centerX = trackRect.left + inset + f * (trackRect.width - 2 * inset)
-            return centerX - rowRect.left
-          })
-        )
+        const centers = VALUES.map((v) => {
+          const f = (v - MIN) / (MAX - MIN)
+          return trackRect.left + inset + f * (trackRect.width - 2 * inset)
+        })
+
+        setTickLefts(centers.map((centerX) => centerX - rowRect.left))
+        setTrackTickLefts(centers.map((centerX) => centerX - wrapRect.left))
       })
     }
 
@@ -91,7 +93,7 @@ export function LikertSlider({
         </span>
       </div>
 
-      <div ref={sliderWrapRef} className="w-full">
+      <div ref={sliderWrapRef} className="relative w-full">
         <Slider
           aria-label="Rating"
           value={[value]}
@@ -102,22 +104,33 @@ export function LikertSlider({
           className="w-full px-2"
           trackClassName="data-[orientation=horizontal]:h-[3px] bg-muted-foreground"
           rangeClassName="hidden"
-          thumbClassName="h-8 w-8 bg-transparent text-2xl"
+          thumbClassName="relative z-10 h-8 w-8 bg-transparent text-2xl"
           thumbContent={<span aria-hidden>😃</span>}
         />
+        {trackTickLefts &&
+          VALUES.map((v, i) => (
+            <span
+              key={v}
+              aria-hidden
+              className="absolute top-1/2 z-0 h-3 w-px -translate-x-1/2 -translate-y-1/2 cursor-pointer bg-muted-foreground"
+              style={{ left: `${trackTickLefts[i]}px` }}
+            />
+          ))}
       </div>
 
       <div ref={ticksRowRef} className="relative h-6 w-full text-base font-base text-muted-foreground">
         {VALUES.map((v, i) => (
-          <span
+          <button
             key={v}
-            className={`absolute top-0 -translate-x-1/2 whitespace-nowrap ${
+            type="button"
+            onClick={() => onChange(v)}
+            className={`absolute top-0 -translate-x-1/2 cursor-pointer whitespace-nowrap bg-transparent p-0 ${
               v === value ? 'font-bold text-foreground' : ''
             }`}
             style={tickLefts ? { left: `${tickLefts[i]}px` } : { visibility: 'hidden' }}
           >
             {LIKERT_LABELS[v]}
-          </span>
+          </button>
         ))}
       </div>
     </div>
