@@ -15,14 +15,21 @@ Scoring model for the AI-attitude archetype shown to visitors: which of 22 arche
 
 **Mechanics:**
 
-1. **Confident domains** — a domain counts only once it has ≥ `MIN_RATINGS_PER_DOMAIN` ratings (currently 2). Below that, it's excluded entirely, not downweighted.
+1. **Confident domains** — a domain counts only once it has ≥ `MIN_RATINGS_PER_DOMAIN` ratings (2). Below that, it's excluded entirely, not downweighted. Kept at 2 rather than raised: a noise-floor simulation showed confident-domain *count* — not ratings-per-domain — is what drives false standouts, so that's what the standout threshold below is indexed on instead (see `scripts/simulate-archetypes.ts`).
 2. **Own overall baseline** — the equal-domain-weighted mean of all confident domains' averages. This is the visitor's personal reference point, not a fixed scale midpoint.
 3. **Per-domain deviation** — for every confident domain: `deviation = domainAverage − ownOverallAverage`. Measures divergence from *this visitor's own* norm, not an absolute scale.
 4. **Standout selection**:
    - `confidentDomains.length < 2` → **The Blank Slate** (not enough coverage yet for a real comparison — a data gap, not a personality signal).
-   - Else `maxAbsDeviation = max(|deviation_d|)` across confident domains. If it's below `MIN_STANDOUT_DEVIATION` → **The Even Keel** (enough data, genuinely no divergence — a real profile, not a gap).
+   - Else `maxAbsDeviation = max(|deviation_d|)` across confident domains. If it's below the standout threshold for that visitor's confident-domain count (table below) → **The Even Keel** (enough data, genuinely no divergence — a real profile, not a gap).
    - Otherwise, standout domain = the one with the largest `|deviation|`. **Tie-break**: equal/near-equal `|deviation|` goes to the domain with the higher rating count. (Tie-break only decides between two already-close domains — it's a separate, narrow mechanism from whether a deviation crosses the standout threshold at all.)
 5. **Direction & naming** — `sign(deviation_standout)` picks the domain's warm name (`> 0`) or cool name (`< 0`).
+
+**Standout threshold, by confident-domain count** (`STANDOUT_THRESHOLD_BY_DOMAIN_COUNT` in `lib/prototype/archetypes.ts`): a flat number is wrong for everyone, since the noise floor — how large `maxAbsDeviation` gets for a visitor with *no real domain preference*, by chance alone — scales with how many domains they've rated (it's a max over more samples). Each value below is the smallest threshold (searched in 0.01 steps against a 300k-trial synthetic simulation) whose false-positive rate — the share of no-preference visitors who'd still get a domain archetype instead of The Even Keel — is ≤10%. Low domain counts have few achievable deviation values, so a plain percentile lookup can land mid-gap and badly overshoot the target (e.g. the 90th percentile at 2 domains gives a 28% false-positive rate, not 10%) — searching directly for the target rate avoids that. Real rates land 6–9.5% across the table, comfortably at or under target:
+
+| Confident domains | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|
+| Threshold | 0.60 | 0.90 | 1.05 | 1.15 | 1.15 | 1.18 | 1.22 | 1.26 | 1.29 |
+| False-positive rate | 8.5% | 7.3% | 6.7% | 6.2% | 9.4% | 9.0% | 9.0% | 9.3% | 9.1% |
 
 **Worked example**: Healthcare `[4, 4, 3]` (avg 3.67), Mobility `[2, 1]` (avg 1.5), Finances `[3]` (n=1, excluded), Education `[3, 4, 3, 3]` (avg 3.25). Own baseline = `(3.67 + 1.5 + 3.25) / 3 = 2.81`. Deviations: Healthcare +0.86, Mobility −1.31, Education +0.44. Standout = Mobility (cool) → **The Backseat Driver**.
 
@@ -50,22 +57,5 @@ Scoring model for the AI-attitude archetype shown to visitors: which of 22 arche
 | Legal & Public Services | The Fine Print | Standout = Legal & Public Services, deviation < 0 | "Rules, rights, and paperwork are the one place you don't trust a shortcut — too much on the line to hand it over." |
 | Media & Culture | The Remix | Standout = Media & Culture, deviation > 0 | "Art, writing, and culture are where you're most open to AI — you care more about the result than who (or what) made it." |
 | Media & Culture | The Art Defender | Standout = Media & Culture, deviation < 0 | "Creativity is the one place you want to stay entirely human-made — this is where AI hasn't earned a seat." |
-| — | The Even Keel | ≥2 confident domains, max\|deviation\| < 0.3 | "You're remarkably consistent — whatever your take on AI, it holds steady across everything you've rated so far, no domain pulling ahead of the rest." |
+| — | The Even Keel | ≥2 confident domains, max\|deviation\| below the standout threshold for that domain count | "You're remarkably consistent — whatever your take on AI, it holds steady across everything you've rated so far, no domain pulling ahead of the rest." |
 | — | The Blank Slate | <2 confident domains | "You haven't rated enough across different domains yet for a clear lean to show — keep going and we'll find where you stand out." |
-
-## Open items
-
-- **Fine-tune `MIN_STANDOUT_DEVIATION`.** A synthetic noise-floor simulation (visitors with no real domain preference, ratings drawn around one personal baseline) shows the current placeholder (`0.3`) is too low — and more specifically, that the noise floor *scales with confident-domain count*, so no single flat number is correct for every visitor. A visitor with a genuine 10-domain spread and *no real preference* would get a specific domain archetype instead of Even Keel 99% of the time at the current threshold. Still open: pick a target false-positive rate, then decide between a domain-count-indexed threshold table vs. one conservative flat number.
-
-  False-positive rate at the current `0.3` threshold, by confident-domain count:
-
-  | Confident domains | False-positive rate @ 0.3 |
-  |---|---|
-  | 2 | 31% |
-  | 3 | 91% |
-  | 5 | 91% |
-  | 10 | 99% |
-
-- **Remove Level and Polarization from the implementation.** These were originally meant to ride alongside the archetype as badges (e.g. "Curious · Steady"), but now that direction and domain specificity are already carried by the 22 distinct archetypes, they're redundant — cut the badge computation and any UI that renders it.
-- **Re-derive `MIN_RATINGS_PER_DOMAIN`** — not because of the 5-point scale (a prior version of this doc said that; it's wrong, since this is a count, not a scale value). The real reason: deviation-based standout selection amplifies low-n domain noise more than plain averaging did, so a noisy 2-rating domain can now single-handedly decide the archetype. The simulation shows raising it from 2→4 only partially helps (e.g. at 10 domains, false-positive rate barely moves, 99%→97%) — domain count is the dominant factor, not ratings-per-domain. Tune alongside the threshold work above.
-- **Re-validate once thresholds are set.** Named synthetic test cases (sparse, dense, polarized, consistent, tie-break, Blank Slate, Even Keel) already run against the real scoring logic — but under the un-tuned threshold, so they need re-running once the threshold and ratings-per-domain decisions above are resolved.

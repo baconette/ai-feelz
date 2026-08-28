@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 function Slider({
   className,
   trackClassName,
+  rangeClassName,
   thumbClassName,
   thumbContent,
   defaultValue,
@@ -18,6 +19,7 @@ function Slider({
   ...props
 }: React.ComponentProps<typeof SliderPrimitive.Root> & {
   trackClassName?: string
+  rangeClassName?: string
   thumbClassName?: string
   thumbContent?: React.ReactNode
 }) {
@@ -53,7 +55,10 @@ function Slider({
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
-          className="absolute bg-main data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full"
+          className={cn(
+            "absolute bg-main data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full",
+            rangeClassName,
+          )}
         />
       </SliderPrimitive.Track>
       {Array.from({ length: _values.length }, (_, index) => (
