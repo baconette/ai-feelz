@@ -1,15 +1,16 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { NotionDomain, NotionUseCase } from '@/lib/notion/client'
-import { computeArchetype, type ArchetypeResult } from '@/lib/prototype/archetypes'
+import { computeArchetype } from '@/lib/prototype/archetypes'
 import type { Rating, RatingsMap } from '@/lib/prototype/types'
 import { UseCaseCard } from './components/UseCaseCard'
 import { LandingHero } from './components/LandingHero'
 import { ArchetypeResults } from './components/ArchetypeResults'
-import { SessionResultView } from './components/SessionResultView'
+import { SessionResultView, type SessionViewState } from './components/SessionResultView'
 import { Checkbox } from '@/components/ui/checkbox'
+import { getSessionByCode } from './actions'
 
 const BUNDLE_SIZE = 10
 
@@ -37,15 +38,32 @@ export function PrototypeFlow({
   useCases: NotionUseCase[]
   domains: NotionDomain[]
 }) {
-  const [view, setView] = useState<View>('intro')
+  const searchParams = useSearchParams()
+  const friendCodeFromLink = searchParams.get('friend') ?? undefined
+
+  const [view, setView] = useState<View>(friendCodeFromLink ? 'viewingSession' : 'intro')
   const [ratings, setRatings] = useState<RatingsMap>({})
   const [bundle, setBundle] = useState<NotionUseCase[]>([])
   const [bundleIndex, setBundleIndex] = useState(0)
   const [showThresholdPlaceholder, setShowThresholdPlaceholder] = useState(false)
-  const [viewedResult, setViewedResult] = useState<ArchetypeResult | null>(null)
+  const [sharedSession, setSharedSession] = useState<SessionViewState>({ status: 'loading' })
 
-  const searchParams = useSearchParams()
-  const friendCodeFromLink = searchParams.get('friend') ?? undefined
+  useEffect(() => {
+    if (!friendCodeFromLink) return
+    let cancelled = false
+    setSharedSession({ status: 'loading' })
+    getSessionByCode(friendCodeFromLink)
+      .then((result) => {
+        if (cancelled) return
+        setSharedSession(result ? { status: 'found', result } : { status: 'error' })
+      })
+      .catch(() => {
+        if (!cancelled) setSharedSession({ status: 'error' })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [friendCodeFromLink])
 
   const archetype = useMemo(
     () => computeArchetype(ratings, useCases, domains),
@@ -77,17 +95,11 @@ export function PrototypeFlow({
     setRatings({})
     setBundle([])
     setBundleIndex(0)
-    setViewedResult(null)
     setView('intro')
   }
 
-  function handleViewSession(result: ArchetypeResult) {
-    setViewedResult(result)
-    setView('viewingSession')
-  }
-
   if (view === 'intro') {
-    return <LandingHero domains={domains} onStart={startBundle} onViewSession={handleViewSession} />
+    return <LandingHero domains={domains} onStart={startBundle} />
   }
 
   return (
@@ -98,8 +110,8 @@ export function PrototypeFlow({
       />
 
       <div className="relative z-10">
-        {view === 'viewingSession' && viewedResult && (
-          <SessionResultView result={viewedResult} onStartOwn={startBundle} onBack={reset} />
+        {view === 'viewingSession' && (
+          <SessionResultView state={sharedSession} onStartOwn={startBundle} />
         )}
 
         {view === 'rating' && bundle[bundleIndex] && (

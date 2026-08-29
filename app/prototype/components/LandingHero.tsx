@@ -1,11 +1,7 @@
-import { useState } from 'react'
 import type { NotionDomain } from '@/lib/notion/client'
-import type { ArchetypeResult } from '@/lib/prototype/archetypes'
 import { DOMAIN_COLORS, DEFAULT_DOMAIN_MARQUEE_CLASSES } from '@/lib/prototype/domain-colors'
 import { Button } from '@/components/ui/button'
 import Marquee from '@/components/ui/marquee'
-import { FriendCodeForm } from './FriendCodeForm'
-import { getSessionByCode } from '../actions'
 
 const HEADING_CLASS =
   'text-5xl font-heading uppercase leading-[0.95] tracking-tight text-background sm:text-6xl'
@@ -24,34 +20,10 @@ function buildMarqueeItems(domains: NotionDomain[]) {
 export function LandingHero({
   domains,
   onStart,
-  onViewSession,
 }: {
   domains: NotionDomain[]
   onStart: () => void
-  onViewSession: (result: ArchetypeResult) => void
 }) {
-  const [showCodeEntry, setShowCodeEntry] = useState(false)
-  const [code, setCode] = useState('')
-  const [pending, setPending] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function handleLookup() {
-    setPending(true)
-    setError(null)
-    try {
-      const result = await getSessionByCode(code)
-      if (result) {
-        onViewSession(result)
-      } else {
-        setError("We couldn't find a session with that code.")
-      }
-    } catch {
-      setError('Something went wrong — please try again.')
-    } finally {
-      setPending(false)
-    }
-  }
-
   return (
     <div className="relative min-h-screen overflow-hidden">
       <div
@@ -86,29 +58,7 @@ export function LandingHero({
             <Button type="button" variant="neutral" size="lg" onClick={onStart} className="w-full">
               Start Your Profile
             </Button>
-            <button
-              type="button"
-              onClick={() => setShowCodeEntry(true)}
-              className="text-center text-xs font-base text-main-foreground underline hover:text-background"
-            >
-              Enter a code
-            </button>
           </div>
-
-          {showCodeEntry && (
-            <>
-              <FriendCodeForm
-                value={code}
-                onChange={setCode}
-                onSubmit={handleLookup}
-                paragraphClassName="text-main-foreground"
-                description="Enter a code to view someone's shared results."
-                submitLabel={pending ? 'Looking up…' : 'View results'}
-                disabled={pending}
-              />
-              {error && <p className="text-xs font-base text-red-400">{error}</p>}
-            </>
-          )}
         </div>
       </div>
     </div>
