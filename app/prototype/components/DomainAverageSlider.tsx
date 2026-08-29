@@ -27,11 +27,13 @@ function Thumb({
 
 export function DomainAverageSlider({
   average,
+  averageEmoji = '😃',
   friendAverage,
   othersAverage,
   max = 4,
 }: {
   average: number
+  averageEmoji?: string
   friendAverage?: number
   othersAverage?: number
   max?: number
@@ -44,7 +46,7 @@ export function DomainAverageSlider({
       {friendAverage !== undefined && (
         <Thumb value={friendAverage} max={max} emoji="✌️" sizeClass="text-[1.75rem]" />
       )}
-      <Thumb value={average} max={max} emoji="😃" sizeClass="text-[1.25rem]" />
+      <Thumb value={average} max={max} emoji={averageEmoji} sizeClass="text-[1.25rem]" />
     </div>
   )
 }

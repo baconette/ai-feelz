@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { NotionDomain, NotionUseCase } from '@/lib/notion/client'
 import { computeArchetype } from '@/lib/prototype/archetypes'
@@ -8,11 +8,13 @@ import type { Rating, RatingsMap } from '@/lib/prototype/types'
 import { UseCaseCard } from './components/UseCaseCard'
 import { LandingHero } from './components/LandingHero'
 import { ArchetypeResults } from './components/ArchetypeResults'
+import { SessionResultView, type SessionViewState } from './components/SessionResultView'
 import { Checkbox } from '@/components/ui/checkbox'
+import { getSessionByCode } from './actions'
 
 const BUNDLE_SIZE = 10
 
-type View = 'intro' | 'rating' | 'results'
+type View = 'intro' | 'rating' | 'results' | 'viewingSession'
 
 function shuffle<T>(items: T[]): T[] {
   const copy = [...items]
@@ -23,8 +25,10 @@ function shuffle<T>(items: T[]): T[] {
   return copy
 }
 
-function makeBundle(pool: NotionUseCase[]): NotionUseCase[] {
-  return shuffle(pool).slice(0, Math.min(BUNDLE_SIZE, pool.length))
+function makeBundle(pool: NotionUseCase[], ratings: RatingsMap): NotionUseCase[] {
+  const unrated = pool.filter((useCase) => !(useCase.notionId in ratings))
+  const source = unrated.length > 0 ? unrated : pool
+  return shuffle(source).slice(0, Math.min(BUNDLE_SIZE, source.length))
 }
 
 export function PrototypeFlow({
@@ -34,14 +38,32 @@ export function PrototypeFlow({
   useCases: NotionUseCase[]
   domains: NotionDomain[]
 }) {
-  const [view, setView] = useState<View>('intro')
+  const searchParams = useSearchParams()
+  const friendCodeFromLink = searchParams.get('friend') ?? undefined
+
+  const [view, setView] = useState<View>(friendCodeFromLink ? 'viewingSession' : 'intro')
   const [ratings, setRatings] = useState<RatingsMap>({})
   const [bundle, setBundle] = useState<NotionUseCase[]>([])
   const [bundleIndex, setBundleIndex] = useState(0)
   const [showThresholdPlaceholder, setShowThresholdPlaceholder] = useState(false)
+  const [sharedSession, setSharedSession] = useState<SessionViewState>({ status: 'loading' })
 
-  const searchParams = useSearchParams()
-  const friendCodeFromLink = searchParams.get('friend') ?? undefined
+  useEffect(() => {
+    if (!friendCodeFromLink) return
+    let cancelled = false
+    setSharedSession({ status: 'loading' })
+    getSessionByCode(friendCodeFromLink)
+      .then((result) => {
+        if (cancelled) return
+        setSharedSession(result ? { status: 'found', result } : { status: 'error' })
+      })
+      .catch(() => {
+        if (!cancelled) setSharedSession({ status: 'error' })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [friendCodeFromLink])
 
   const archetype = useMemo(
     () => computeArchetype(ratings, useCases, domains),
@@ -49,7 +71,7 @@ export function PrototypeFlow({
   )
 
   function startBundle() {
-    setBundle(makeBundle(useCases))
+    setBundle(makeBundle(useCases, ratings))
     setBundleIndex(0)
     setView('rating')
   }
@@ -88,6 +110,10 @@ export function PrototypeFlow({
       />
 
       <div className="relative z-10">
+        {view === 'viewingSession' && (
+          <SessionResultView state={sharedSession} onStartOwn={startBundle} />
+        )}
+
         {view === 'rating' && bundle[bundleIndex] && (
           <UseCaseCard
             useCase={bundle[bundleIndex]}

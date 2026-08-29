@@ -44,26 +44,20 @@ export function LandingHero({
 
         <div className="mx-auto lg:mx-0 lg:ml-20 w-full max-w-[33rem] space-y-6 px-6">
           <h2 className={HEADING_CLASS}>
-            But it&apos;s not
+            Do you want AI
             <br />
-            all the same
+            in your life?
           </h2>
 
           <p className="text-sm font-base text-main-foreground sm:text-base">
-            Learn about its different applications by choosing when you prefer a human or an AI
-            perform an activity.
+            Choose when you prefer a human or an AI perform an activity, find out what&apos;s your
+            AI profile and see how you compare to others.
           </p>
 
           <div className="flex flex-col items-center gap-3">
             <Button type="button" variant="neutral" size="lg" onClick={onStart} className="w-full">
-              Start Rating →
+              Start Your Profile
             </Button>
-            <button
-              type="button"
-              className="text-center text-xs font-base text-main-foreground underline hover:text-background"
-            >
-              Have a code? Enter it
-            </button>
           </div>
         </div>
       </div>

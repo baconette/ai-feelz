@@ -6,10 +6,11 @@ import { mockFriendForDomain, mockFriendArchetype } from '@/lib/prototype/mockFr
 import { mockAggregateForDomain } from '@/lib/prototype/mockAggregate'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { DomainAverageSlider } from './DomainAverageSlider'
 import { ArchetypeCard } from './ArchetypeCard'
+import { FriendCodeForm } from './FriendCodeForm'
 import { DOMAIN_COLORS, DEFAULT_DOMAIN_TEXT_CLASSES } from '@/lib/prototype/domain-colors'
+import { createSessionCode } from '../actions'
 
 type FriendState = 'idle' | 'form' | 'active'
 
@@ -33,6 +34,8 @@ export function ArchetypeResults({
 
   const [shared, setShared] = useState(false)
   const [permalink, setPermalink] = useState('')
+  const [sharing, setSharing] = useState(false)
+  const [shareError, setShareError] = useState(false)
 
   function handleToggleFriend() {
     if (friendState === 'idle') {
@@ -44,20 +47,43 @@ export function ArchetypeResults({
     }
   }
 
-  function handleShare() {
-    const code = Math.random().toString(36).slice(2, 8)
-    const url = `${window.location.origin}/prototype?friend=${code}`
-    setPermalink(url)
-    setShared(true)
-    navigator.clipboard?.writeText(url).catch(() => {})
+  async function handleShare() {
+    setSharing(true)
+    setShareError(false)
+    try {
+      const code = await createSessionCode(result)
+      const url = `${window.location.origin}/prototype?friend=${code}`
+      setPermalink(url)
+      setShared(true)
+      navigator.clipboard?.writeText(url).catch(() => {})
+    } catch {
+      setShareError(true)
+    } finally {
+      setSharing(false)
+    }
   }
 
   const friend = friendState === 'active' ? mockFriendArchetype() : null
 
+  const domainAgreement =
+    friendState === 'active'
+      ? [...result.domainScores]
+          .map((d) => ({
+            domainId: d.domainId,
+            domainName: d.domainName,
+            average: d.average,
+            friendAverage: mockFriendForDomain(d.domainName),
+            diff: Math.abs(d.average - mockFriendForDomain(d.domainName)),
+          }))
+          .sort((a, b) => a.diff - b.diff)
+      : []
+  const mostAgreed = domainAgreement.slice(0, 2)
+  const mostDisagreed = [...domainAgreement].reverse().slice(0, 2)
+
   return (
     <Card className="text-center">
       <CardHeader className="items-center">
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-stretch">
+        <div className="flex w-full flex-row items-stretch gap-2 sm:gap-3">
           <ArchetypeCard
             headline={result.headline}
             summary={result.summary}
@@ -79,7 +105,7 @@ export function ArchetypeResults({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-6 py-6">
+      <CardContent className="space-y-6 pb-6">
         <div className="flex items-center justify-between">
           <p className="text-xs font-base text-muted-foreground">
             Your average across {result.ratingCount} answers
@@ -93,31 +119,73 @@ export function ArchetypeResults({
           </button>
         </div>
 
-        <div className="flex items-center justify-between text-xl">
+        <div className="flex items-center justify-between text-4xl">
           <span aria-hidden>🧠</span>
           <span aria-hidden>🤖</span>
         </div>
 
-        <div className="mb-12 !mt-2 space-y-10 text-left">
-          {result.domainScores.map((d) => (
-            <div key={d.domainId}>
-              <div
-                className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
-              >
-                {d.domainName}
+        {friendState === 'active' && (
+          <div className="mb-12 !mt-4 text-left">
+            <div>
+              <p className="mb-4 text-base font-heading text-foreground">Where you agreed most</p>
+              <div className="space-y-10">
+                {mostAgreed.map((d) => (
+                  <div key={d.domainId}>
+                    <div
+                      className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
+                    >
+                      {d.domainName}
+                    </div>
+                    <DomainAverageSlider
+                      average={d.average}
+                      friendAverage={d.friendAverage}
+                      othersAverage={hasAggregateThreshold ? mockAggregateForDomain(d.domainName) : undefined}
+                    />
+                  </div>
+                ))}
               </div>
-              <DomainAverageSlider
-                average={d.average}
-                friendAverage={
-                  friendState === 'active' ? mockFriendForDomain(d.domainName) : undefined
-                }
-                othersAverage={
-                  hasAggregateThreshold ? mockAggregateForDomain(d.domainName) : undefined
-                }
-              />
             </div>
-          ))}
-        </div>
+            <div className="mt-12">
+              <p className="mb-4 text-base font-heading text-foreground">Where you disagree the most</p>
+              <div className="space-y-10">
+                {mostDisagreed.map((d) => (
+                  <div key={d.domainId}>
+                    <div
+                      className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
+                    >
+                      {d.domainName}
+                    </div>
+                    <DomainAverageSlider
+                      average={d.average}
+                      friendAverage={d.friendAverage}
+                      othersAverage={hasAggregateThreshold ? mockAggregateForDomain(d.domainName) : undefined}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {friendState !== 'active' && (
+          <div className="mb-12 !mt-2 space-y-10 text-left">
+            {result.domainScores.map((d) => (
+              <div key={d.domainId}>
+                <div
+                  className={`mb-2 text-base font-base ${DOMAIN_COLORS[d.domainName]?.domainText ?? DEFAULT_DOMAIN_TEXT_CLASSES}`}
+                >
+                  {d.domainName}
+                </div>
+                <DomainAverageSlider
+                  average={d.average}
+                  othersAverage={
+                    hasAggregateThreshold ? mockAggregateForDomain(d.domainName) : undefined
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-4 text-xs font-base text-muted-foreground">
           <span>😃 You</span>
@@ -129,33 +197,21 @@ export function ArchetypeResults({
           <Button type="button" onClick={handleToggleFriend}>
             {friendState === 'idle' ? '✌️ Compare to friend' : 'Hide friend'}
           </Button>
-          <Button type="button" variant="neutral" onClick={handleShare}>
-            🔗 {shared ? 'Link copied' : 'Share your results'}
+          <Button type="button" variant="neutral" disabled={sharing} onClick={handleShare}>
+            🔗 {sharing ? 'Sharing…' : shared ? 'Link copied' : 'Share your results'}
           </Button>
         </div>
 
+        {shareError && (
+          <p className="text-xs font-base text-red-500">Could not save your results — please try again.</p>
+        )}
+
         {friendState === 'form' && (
-          <div className="space-y-2 text-left">
-            <p className="text-xs font-base text-muted-foreground">
-              Enter the permalink code from a friend&apos;s shared results to see how you compare.
-            </p>
-            <div className="flex gap-2">
-              <Input
-                className="flex-1"
-                value={friendCode}
-                onChange={(e) => setFriendCode(e.target.value)}
-                placeholder="e.g. wmoqie"
-              />
-              <Button
-                type="button"
-                variant="neutral"
-                disabled={!friendCode.trim()}
-                onClick={() => setFriendState('active')}
-              >
-                Compare
-              </Button>
-            </div>
-          </div>
+          <FriendCodeForm
+            value={friendCode}
+            onChange={setFriendCode}
+            onSubmit={() => setFriendState('active')}
+          />
         )}
 
         {shared && (
