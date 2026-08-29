@@ -6,10 +6,11 @@ import { mockFriendForDomain, mockFriendArchetype } from '@/lib/prototype/mockFr
 import { mockAggregateForDomain } from '@/lib/prototype/mockAggregate'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { DomainAverageSlider } from './DomainAverageSlider'
 import { ArchetypeCard } from './ArchetypeCard'
+import { FriendCodeForm } from './FriendCodeForm'
 import { DOMAIN_COLORS, DEFAULT_DOMAIN_TEXT_CLASSES } from '@/lib/prototype/domain-colors'
+import { createSessionCode } from '../actions'
 
 type FriendState = 'idle' | 'form' | 'active'
 
@@ -33,6 +34,8 @@ export function ArchetypeResults({
 
   const [shared, setShared] = useState(false)
   const [permalink, setPermalink] = useState('')
+  const [sharing, setSharing] = useState(false)
+  const [shareError, setShareError] = useState(false)
 
   function handleToggleFriend() {
     if (friendState === 'idle') {
@@ -44,12 +47,20 @@ export function ArchetypeResults({
     }
   }
 
-  function handleShare() {
-    const code = Math.random().toString(36).slice(2, 8)
-    const url = `${window.location.origin}/prototype?friend=${code}`
-    setPermalink(url)
-    setShared(true)
-    navigator.clipboard?.writeText(url).catch(() => {})
+  async function handleShare() {
+    setSharing(true)
+    setShareError(false)
+    try {
+      const code = await createSessionCode(result)
+      const url = `${window.location.origin}/prototype?friend=${code}`
+      setPermalink(url)
+      setShared(true)
+      navigator.clipboard?.writeText(url).catch(() => {})
+    } catch {
+      setShareError(true)
+    } finally {
+      setSharing(false)
+    }
   }
 
   const friend = friendState === 'active' ? mockFriendArchetype() : null
@@ -186,33 +197,21 @@ export function ArchetypeResults({
           <Button type="button" onClick={handleToggleFriend}>
             {friendState === 'idle' ? '✌️ Compare to friend' : 'Hide friend'}
           </Button>
-          <Button type="button" variant="neutral" onClick={handleShare}>
-            🔗 {shared ? 'Link copied' : 'Share your results'}
+          <Button type="button" variant="neutral" disabled={sharing} onClick={handleShare}>
+            🔗 {sharing ? 'Sharing…' : shared ? 'Link copied' : 'Share your results'}
           </Button>
         </div>
 
+        {shareError && (
+          <p className="text-xs font-base text-red-500">Could not save your results — please try again.</p>
+        )}
+
         {friendState === 'form' && (
-          <div className="space-y-2 text-left">
-            <p className="text-xs font-base text-muted-foreground">
-              Enter the permalink code from a friend&apos;s shared results to see how you compare.
-            </p>
-            <div className="flex gap-2">
-              <Input
-                className="flex-1"
-                value={friendCode}
-                onChange={(e) => setFriendCode(e.target.value)}
-                placeholder="e.g. wmoqie"
-              />
-              <Button
-                type="button"
-                variant="neutral"
-                disabled={!friendCode.trim()}
-                onClick={() => setFriendState('active')}
-              >
-                Compare
-              </Button>
-            </div>
-          </div>
+          <FriendCodeForm
+            value={friendCode}
+            onChange={setFriendCode}
+            onSubmit={() => setFriendState('active')}
+          />
         )}
 
         {shared && (

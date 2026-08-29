@@ -3,16 +3,17 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { NotionDomain, NotionUseCase } from '@/lib/notion/client'
-import { computeArchetype } from '@/lib/prototype/archetypes'
+import { computeArchetype, type ArchetypeResult } from '@/lib/prototype/archetypes'
 import type { Rating, RatingsMap } from '@/lib/prototype/types'
 import { UseCaseCard } from './components/UseCaseCard'
 import { LandingHero } from './components/LandingHero'
 import { ArchetypeResults } from './components/ArchetypeResults'
+import { SessionResultView } from './components/SessionResultView'
 import { Checkbox } from '@/components/ui/checkbox'
 
 const BUNDLE_SIZE = 10
 
-type View = 'intro' | 'rating' | 'results'
+type View = 'intro' | 'rating' | 'results' | 'viewingSession'
 
 function shuffle<T>(items: T[]): T[] {
   const copy = [...items]
@@ -41,6 +42,7 @@ export function PrototypeFlow({
   const [bundle, setBundle] = useState<NotionUseCase[]>([])
   const [bundleIndex, setBundleIndex] = useState(0)
   const [showThresholdPlaceholder, setShowThresholdPlaceholder] = useState(false)
+  const [viewedResult, setViewedResult] = useState<ArchetypeResult | null>(null)
 
   const searchParams = useSearchParams()
   const friendCodeFromLink = searchParams.get('friend') ?? undefined
@@ -75,11 +77,17 @@ export function PrototypeFlow({
     setRatings({})
     setBundle([])
     setBundleIndex(0)
+    setViewedResult(null)
     setView('intro')
   }
 
+  function handleViewSession(result: ArchetypeResult) {
+    setViewedResult(result)
+    setView('viewingSession')
+  }
+
   if (view === 'intro') {
-    return <LandingHero domains={domains} onStart={startBundle} />
+    return <LandingHero domains={domains} onStart={startBundle} onViewSession={handleViewSession} />
   }
 
   return (
@@ -90,6 +98,10 @@ export function PrototypeFlow({
       />
 
       <div className="relative z-10">
+        {view === 'viewingSession' && viewedResult && (
+          <SessionResultView result={viewedResult} onStartOwn={startBundle} onBack={reset} />
+        )}
+
         {view === 'rating' && bundle[bundleIndex] && (
           <UseCaseCard
             useCase={bundle[bundleIndex]}
