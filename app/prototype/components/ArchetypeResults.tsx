@@ -114,7 +114,7 @@ export function ArchetypeResults({
         </div>
 
         {friendState === 'active' && (
-          <div className="mb-12 space-y-6 text-left">
+          <div className="mb-12 !mt-4 text-left">
             <div>
               <p className="mb-4 text-base font-heading text-foreground">Where you agreed most</p>
               <div className="space-y-10">
@@ -134,7 +134,7 @@ export function ArchetypeResults({
                 ))}
               </div>
             </div>
-            <div>
+            <div className="mt-12">
               <p className="mb-4 text-base font-heading text-foreground">Where you disagree the most</p>
               <div className="space-y-10">
                 {mostDisagreed.map((d) => (
