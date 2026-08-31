@@ -14,7 +14,9 @@ test('rate a bundle, reach results, and generate a share link', async ({ page })
   // Answer every card in the first bundle by dragging the slider to a value
   // via keyboard, which works regardless of how many cards the bundle serves.
   while (await page.getByRole('button', { name: /^next$/i }).isVisible()) {
-    await page.getByRole('slider', { name: 'Rating' }).focus()
+    // The aria-label="Rating" lands on the Radix wrapper (role "generic"),
+    // not on the role="slider" thumb itself, so select by role alone.
+    await page.getByRole('slider').focus()
     await page.keyboard.press('ArrowRight')
     await page.getByRole('button', { name: /^next$/i }).click()
   }
