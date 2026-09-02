@@ -15,11 +15,11 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Do you want AI in your life?",
+  title: "Do you want AI in your life? 🤖",
   description:
     "Find your AI-vs-human archetype across everyday domains, then compare with a friend.",
   openGraph: {
-    title: "Do you want AI in your life?",
+    title: "Do you want AI in your life? 🤖",
     description:
       "Find your AI-vs-human archetype across everyday domains, then compare with a friend.",
     images: [
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Do you want AI in your life?",
+    title: "Do you want AI in your life? 🤖",
     description:
       "Find your AI-vs-human archetype across everyday domains, then compare with a friend.",
     images: ["/og-A@2x.png"],
