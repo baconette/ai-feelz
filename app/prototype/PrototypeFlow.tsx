@@ -47,6 +47,7 @@ export function PrototypeFlow({
   const [bundleIndex, setBundleIndex] = useState(0)
   const [showThresholdPlaceholder, setShowThresholdPlaceholder] = useState(false)
   const [sharedSession, setSharedSession] = useState<SessionViewState>({ status: 'loading' })
+  const [sessionCode, setSessionCode] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     if (!friendCodeFromLink) return
@@ -57,7 +58,8 @@ export function PrototypeFlow({
         if (cancelled) return
         setSharedSession(result ? { status: 'found', result } : { status: 'error' })
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('[PrototypeFlow] getSessionByCode failed', error)
         if (!cancelled) setSharedSession({ status: 'error' })
       })
     return () => {
@@ -95,6 +97,7 @@ export function PrototypeFlow({
     setRatings({})
     setBundle([])
     setBundleIndex(0)
+    setSessionCode(undefined)
     setView('intro')
   }
 
@@ -136,6 +139,8 @@ export function PrototypeFlow({
               onRestart={reset}
               prefillFriendCode={friendCodeFromLink}
               hasAggregateThreshold={!showThresholdPlaceholder}
+              sessionCode={sessionCode}
+              onSessionCodeChange={setSessionCode}
             />
 
             <label className="flex items-center justify-center gap-2 text-xs font-base text-muted-foreground">

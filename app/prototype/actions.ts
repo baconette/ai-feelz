@@ -23,8 +23,43 @@ export async function createSessionCode(result: ArchetypeResult): Promise<string
     domain_scores: result.domainScores,
   })
 
-  if (error) throw new Error('Could not save your results — please try again.')
+  if (error) {
+    console.error('[createSessionCode] insert failed', error)
+    throw new Error('Could not save your results — please try again.')
+  }
   return code
+}
+
+export async function updateSessionCode(code: string, result: ArchetypeResult): Promise<void> {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('rating_sessions')
+    .update({
+      headline: result.headline,
+      summary: result.summary,
+      kind: result.kind,
+      standout_domain_name: result.standoutDomainName ?? null,
+      direction: result.direction ?? null,
+      overall_average: result.overallAverage,
+      rating_count: result.ratingCount,
+      domain_scores: result.domainScores,
+    })
+    .eq('code', code)
+    .select('code')
+
+  if (error) {
+    console.error('[updateSessionCode] update failed', error)
+    throw new Error('Could not save your results — please try again.')
+  }
+
+  // A blocked RLS policy or a code that no longer exists both come back as
+  // error: null with zero rows affected — without checking this, the caller
+  // (and the visitor) would believe the update succeeded when nothing changed.
+  if (!data || data.length === 0) {
+    console.error('[updateSessionCode] update matched no rows', { code })
+    throw new Error('Could not save your results — please try again.')
+  }
 }
 
 export async function getSessionByCode(code: string): Promise<ArchetypeResult | null> {
@@ -35,7 +70,10 @@ export async function getSessionByCode(code: string): Promise<ArchetypeResult | 
     .eq('code', code.trim())
     .maybeSingle()
 
-  if (error) throw new Error('Could not look up that code — please try again.')
+  if (error) {
+    console.error('[getSessionByCode] query failed', error)
+    throw new Error('Could not look up that code — please try again.')
+  }
   if (!data) return null
 
   return {
