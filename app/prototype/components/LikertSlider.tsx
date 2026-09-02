@@ -101,20 +101,25 @@ export function LikertSlider({
           min={MIN}
           max={MAX}
           step={1}
-          className="w-full px-2"
+          className="relative z-10 w-full px-2"
           trackClassName="data-[orientation=horizontal]:h-[3px] bg-muted-foreground"
           rangeClassName="hidden"
-          thumbClassName="relative z-10 h-8 w-8 bg-transparent text-2xl"
+          thumbClassName="h-8 w-8 bg-white text-2xl"
           thumbContent={<span aria-hidden>😃</span>}
         />
         {trackTickLefts &&
           VALUES.map((v, i) => (
-            <span
+            <button
               key={v}
+              type="button"
               aria-hidden
-              className="absolute top-1/2 z-0 h-3 w-px -translate-x-1/2 -translate-y-1/2 cursor-pointer bg-muted-foreground"
+              tabIndex={-1}
+              onClick={() => onChange(v)}
+              className="absolute top-1/2 z-0 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-pointer items-center justify-center bg-transparent p-0"
               style={{ left: `${trackTickLefts[i]}px` }}
-            />
+            >
+              <span className="h-3 w-px bg-muted-foreground" />
+            </button>
           ))}
       </div>
 
