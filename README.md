@@ -15,8 +15,9 @@ Conversations about AI's role in creative, professional, and personal life tend 
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Charts**: Recharts
-- **Database / Backend**: Supabase (Postgres, Auth, Realtime)
+- **Content**: Notion (use cases and domains are authored there, synced into Supabase)
+- **Database / Backend**: Supabase (Postgres)
+- **Testing**: Vitest + React Testing Library (unit/component), Playwright (E2E)
 - **Deployment**: Netlify
 
 ## Getting Started
@@ -27,11 +28,16 @@ Conversations about AI's role in creative, professional, and personal life tend 
 npm install
 ```
 
-2. Copy `.env.local.example` to `.env.local` and fill in your Supabase credentials:
+2. Copy `.env.test.example` to `.env.local` and fill in your Supabase and Notion credentials:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+NOTION_TOKEN=...
+NOTION_USE_CASES_DATA_SOURCE_ID=...
+NOTION_DOMAINS_DATA_SOURCE_ID=...
+SYNC_SECRET=...
 ```
 
 3. Start the dev server:
@@ -40,28 +46,44 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+Open [http://localhost:3000/prototype](http://localhost:3000/prototype) to see the app (the root path redirects there).
 
 ## Project Structure
 
 ```
 app/
-  page.tsx          # Public visitor form
-  dashboard/        # Protected chart dashboard
-  actions/          # Server Actions for form submissions
+  page.tsx                    # Redirects to /prototype
+  prototype/
+    page.tsx                  # Fetches use cases + domains from Supabase, renders the flow
+    PrototypeFlow.tsx         # Client-side state machine: intro -> rating -> results
+    actions.ts                # Server Actions for saving/loading a shareable results session
+    components/               # Rating card, Likert slider, archetype results, etc.
+  api/
+    sync-use-cases/route.ts   # Syncs Notion domains/use cases into Supabase (bearer-auth'd)
 components/
-  charts/           # Recharts wrapper components (all "use client")
+  ui/                         # shadcn primitives
 lib/
+  prototype/
+    archetypes.ts             # Scoring model that derives a visitor's AI-attitude archetype
+    types.ts, mockAggregate.ts, mockFriend.ts, domain-colors.ts
+  notion/client.ts            # Notion data-source client
   supabase/
-    client.ts       # Browser Supabase client
-    server.ts       # Server Component / Server Action Supabase client
+    client.ts / server.ts     # Browser vs. Server Component/Action Supabase clients
+    admin.ts                  # Service-role client for the Notion sync job
+e2e/                          # Playwright specs
+docs/                         # PRD, archetype-logic spec, flow diagrams
+scripts/simulate-archetypes.ts  # Synthetic-data harness for tuning the archetype thresholds
 ```
 
 ## Key Commands
 
 ```bash
-npm run dev        # Start local dev server
-npm run build      # Production build
-npm run lint       # ESLint
-npm run typecheck  # tsc --noEmit
+npm run dev            # Start local dev server
+npm run build          # Production build
+npm run lint           # ESLint
+npm run typecheck      # tsc --noEmit
+npm run test           # Vitest unit/component tests
+npm run test:watch     # Vitest in watch mode
+npm run test:coverage  # Vitest with coverage report
+npm run test:e2e       # Playwright E2E tests (needs .env.test — see e2e/prototype.spec.ts)
 ```
