@@ -10,6 +10,7 @@ import { ArchetypeCard } from './ArchetypeCard'
 import { FriendCodeForm } from './FriendCodeForm'
 import { DOMAIN_COLORS, DEFAULT_DOMAIN_TEXT_CLASSES } from '@/lib/prototype/domain-colors'
 import { createSessionCode, getSessionByCode, updateSessionCode } from '../actions'
+import { track } from '@/lib/analytics/posthog'
 
 type FriendState = 'idle' | 'form' | 'active'
 
@@ -88,11 +89,13 @@ export function ArchetypeResults({
 
   async function handleShare() {
     if (shared) {
+      track('share_clicked', { share_type: 'recopy' })
       setRecopyHint(true)
       navigator.clipboard?.writeText(permalink).catch(() => {})
       return
     }
 
+    track('share_clicked', { share_type: 'first' })
     setSharing(true)
     setShareError(false)
     setRecopyHint(false)

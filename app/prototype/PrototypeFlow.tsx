@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import type { NotionDomain, NotionUseCase } from '@/lib/notion/client'
 import { computeArchetype } from '@/lib/prototype/archetypes'
@@ -11,6 +11,7 @@ import { ArchetypeResults } from './components/ArchetypeResults'
 import { SessionResultView, type SessionViewState } from './components/SessionResultView'
 import { Checkbox } from '@/components/ui/checkbox'
 import { getSessionByCode } from './actions'
+import { getOrCreateVisitorId, track } from '@/lib/analytics/posthog'
 
 const BUNDLE_SIZE = 10
 
@@ -48,6 +49,28 @@ export function PrototypeFlow({
   const [showThresholdPlaceholder, setShowThresholdPlaceholder] = useState(false)
   const [sharedSession, setSharedSession] = useState<SessionViewState>({ status: 'loading' })
   const [sessionCode, setSessionCode] = useState<string | undefined>(undefined)
+  const [bundleNumber, setBundleNumber] = useState(0)
+  const [bundlesCompletedTotal, setBundlesCompletedTotal] = useState(0)
+  const sessionStartedAt = useRef<number>(0)
+  const hasTrackedSessionStart = useRef(false)
+
+  useEffect(() => {
+    if (hasTrackedSessionStart.current) return
+    hasTrackedSessionStart.current = true
+    sessionStartedAt.current = Date.now()
+    const { id: visitorId, isReturning } = getOrCreateVisitorId()
+    const params = new URLSearchParams(window.location.search)
+    track('session_started', {
+      visitor_id: visitorId,
+      referral_code: friendCodeFromLink ?? null,
+      is_returning: isReturning,
+      referrer_domain: document.referrer ? new URL(document.referrer).hostname : null,
+      utm_source: params.get('utm_source'),
+      utm_medium: params.get('utm_medium'),
+      utm_campaign: params.get('utm_campaign'),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (!friendCodeFromLink) return
@@ -73,19 +96,38 @@ export function PrototypeFlow({
   )
 
   function startBundle() {
+    const nextBundleNumber = bundleNumber + 1
+    setBundleNumber(nextBundleNumber)
     setBundle(makeBundle(useCases, ratings))
     setBundleIndex(0)
     setView('rating')
+    track('bundle_started', { bundle_number: nextBundleNumber })
   }
 
   function handleRatingSubmit(rating: Rating) {
     const current = bundle[bundleIndex]
     setRatings((prev) => ({ ...prev, [current.notionId]: rating }))
+    track('use_case_rated', {
+      use_case_id: current.notionId,
+      domain: domains.find((d) => d.notionId === current.domainId)?.name ?? null,
+      rating_value: rating.value,
+      bundle_number: bundleNumber,
+    })
 
     if (bundleIndex + 1 < bundle.length) {
       setBundleIndex(bundleIndex + 1)
     } else {
+      const nextBundlesCompletedTotal = bundlesCompletedTotal + 1
+      setBundlesCompletedTotal(nextBundlesCompletedTotal)
       setView('results')
+      track('bundle_completed', {
+        bundle_number: bundleNumber,
+        bundles_completed_total: nextBundlesCompletedTotal,
+      })
+      track('results_viewed', {
+        bundles_completed_total: nextBundlesCompletedTotal,
+        session_duration_ms: Date.now() - sessionStartedAt.current,
+      })
     }
   }
 
@@ -127,6 +169,7 @@ export function PrototypeFlow({
             canGoBack={bundleIndex > 0}
             onSubmit={handleRatingSubmit}
             onBack={handleBack}
+            bundleNumber={bundleNumber}
           />
         )}
 

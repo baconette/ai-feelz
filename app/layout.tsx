@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Space_Mono, IBM_Plex_Mono } from "next/font/google";
+import { PosthogProvider } from "@/components/PosthogProvider";
 import "./globals.css";
 
 const spaceMono = Space_Mono({
@@ -47,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${spaceMono.variable} ${ibmPlexMono.variable} antialiased`}>
-        {children}
+        <PosthogProvider>{children}</PosthogProvider>
       </body>
     </html>
   );
