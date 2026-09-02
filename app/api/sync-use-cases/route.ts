@@ -12,7 +12,14 @@ export async function POST(request: NextRequest) {
 
   const supabase = createAdminClient()
 
-  const domains = await fetchDomains()
+  let domains: Awaited<ReturnType<typeof fetchDomains>>
+  try {
+    domains = await fetchDomains()
+  } catch (error) {
+    console.error('[sync-use-cases] fetchDomains failed', error)
+    return NextResponse.json({ error: 'Failed to fetch domains from Notion' }, { status: 502 })
+  }
+
   const domainRows = domains.map((d) => ({
     notion_id: d.notionId,
     name: d.name,
@@ -27,6 +34,7 @@ export async function POST(request: NextRequest) {
       .upsert(domainRows, { onConflict: 'notion_id' })
 
     if (domainUpsertError) {
+      console.error('[sync-use-cases] domain upsert failed', domainUpsertError)
       return NextResponse.json({ error: domainUpsertError.message }, { status: 500 })
     }
   }
@@ -42,10 +50,17 @@ export async function POST(request: NextRequest) {
       : await domainDeleteQuery.neq('notion_id', '')
 
   if (domainDeleteError) {
+    console.error('[sync-use-cases] domain delete failed', domainDeleteError)
     return NextResponse.json({ error: domainDeleteError.message }, { status: 500 })
   }
 
-  const useCases = await fetchPublishedUseCases()
+  let useCases: Awaited<ReturnType<typeof fetchPublishedUseCases>>
+  try {
+    useCases = await fetchPublishedUseCases()
+  } catch (error) {
+    console.error('[sync-use-cases] fetchPublishedUseCases failed', error)
+    return NextResponse.json({ error: 'Failed to fetch use cases from Notion' }, { status: 502 })
+  }
 
   const rows = useCases.map((uc) => ({
     notion_id: uc.notionId,
@@ -66,6 +81,7 @@ export async function POST(request: NextRequest) {
       .upsert(rows, { onConflict: 'notion_id' })
 
     if (upsertError) {
+      console.error('[sync-use-cases] use_cases upsert failed', upsertError)
       return NextResponse.json({ error: upsertError.message }, { status: 500 })
     }
   }
@@ -83,6 +99,7 @@ export async function POST(request: NextRequest) {
       : await deleteQuery.neq('notion_id', '')
 
   if (deleteError) {
+    console.error('[sync-use-cases] use_cases delete failed', deleteError)
     return NextResponse.json({ error: deleteError.message }, { status: 500 })
   }
 

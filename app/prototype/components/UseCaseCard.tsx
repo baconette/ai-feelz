@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { track } from '@/lib/analytics/posthog'
 
 const EXPLANATION_PLACEHOLDER = "There is no explanation, we'll get right to writing it."
 
@@ -34,6 +35,7 @@ export function UseCaseCard({
   canGoBack,
   onSubmit,
   onBack,
+  bundleNumber,
 }: {
   useCase: NotionUseCase
   index: number
@@ -43,17 +45,24 @@ export function UseCaseCard({
   canGoBack: boolean
   onSubmit: (rating: Rating) => void
   onBack: () => void
+  bundleNumber: number
 }) {
   const [value, setValue] = useState<LikertValue>(initialRating?.value ?? 1)
   const [showExplanation, setShowExplanation] = useState(false)
 
+  const domainName = domains.find((d) => d.notionId === useCase.domainId)?.name ?? 'Other'
+
   useEffect(() => {
     setValue(initialRating?.value ?? 1)
     setShowExplanation(false)
+    track('use_case_shown', {
+      use_case_id: useCase.notionId,
+      domain: domainName,
+      bundle_number: bundleNumber,
+      position_in_bundle: index,
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useCase.notionId])
-
-  const domainName = domains.find((d) => d.notionId === useCase.domainId)?.name ?? 'Other'
   const { prefix, rest } = splitSentence(useCase.useCase)
 
   function handleNext() {
