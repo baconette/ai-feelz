@@ -1,6 +1,14 @@
 # ai-feelz
 
-A web app that captures visitor sentiment via a form and visualizes the data on a live dashboard with rich charts.
+An interactive web experience where visitors rate real-world AI use cases — "should a human or an AI do this?" — and get back a personalized "AI attitude profile" they can compare against friends and the broader visitor pool.
+
+## What this project does
+
+Visitors rate AI use cases (103 at launch, organized into domains and subdomains) on a 1–5 scale from Never to Always a human should do it instead of AI. Ratings are served in randomized bundles of 10 so the experience feels like a continuous stream rather than a category-by-category survey. After each bundle, visitors see a personalized results visualization, can compare it against a friend's shared results or an aggregate of all visitors, and can share their own results as a unique link.
+
+## Why this project is useful
+
+Conversations about AI's role in creative, professional, and personal life tend to stay abstract and polarized. This app gives people a structured, low-friction way to articulate where they personally draw the line between human and AI-performed work, see how that compares to their peers, and discover AI use cases they hadn't considered before — turning an abstract debate into something personal and shareable.
 
 ## Stack
 
