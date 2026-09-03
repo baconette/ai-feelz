@@ -9,9 +9,9 @@ import { UseCaseCard } from './components/UseCaseCard'
 import { LandingHero } from './components/LandingHero'
 import { ArchetypeResults } from './components/ArchetypeResults'
 import { SessionResultView, type SessionViewState } from './components/SessionResultView'
-import { Checkbox } from '@/components/ui/checkbox'
-import { getSessionByCode } from './actions'
+import { getRatingSessionCount, getSessionByCode } from './actions'
 import { getOrCreateVisitorId, track } from '@/lib/analytics/posthog'
+import { RESPONSE_THRESHOLD } from '@/lib/prototype/mockAggregate'
 
 const BUNDLE_SIZE = 10
 
@@ -46,13 +46,27 @@ export function PrototypeFlow({
   const [ratings, setRatings] = useState<RatingsMap>({})
   const [bundle, setBundle] = useState<NotionUseCase[]>([])
   const [bundleIndex, setBundleIndex] = useState(0)
-  const [showThresholdPlaceholder, setShowThresholdPlaceholder] = useState(false)
   const [sharedSession, setSharedSession] = useState<SessionViewState>({ status: 'loading' })
   const [sessionCode, setSessionCode] = useState<string | undefined>(undefined)
   const [bundleNumber, setBundleNumber] = useState(0)
   const [bundlesCompletedTotal, setBundlesCompletedTotal] = useState(0)
+  const [hasAggregateThreshold, setHasAggregateThreshold] = useState(false)
   const sessionStartedAt = useRef<number>(0)
   const hasTrackedSessionStart = useRef(false)
+
+  useEffect(() => {
+    let cancelled = false
+    getRatingSessionCount()
+      .then((count) => {
+        if (!cancelled) setHasAggregateThreshold(count >= RESPONSE_THRESHOLD)
+      })
+      .catch((error) => {
+        console.error('[PrototypeFlow] getRatingSessionCount failed', error)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     if (hasTrackedSessionStart.current) return
@@ -120,6 +134,11 @@ export function PrototypeFlow({
       const nextBundlesCompletedTotal = bundlesCompletedTotal + 1
       setBundlesCompletedTotal(nextBundlesCompletedTotal)
       setView('results')
+      getRatingSessionCount()
+        .then((count) => setHasAggregateThreshold(count >= RESPONSE_THRESHOLD))
+        .catch((error) => {
+          console.error('[PrototypeFlow] getRatingSessionCount failed', error)
+        })
       track('bundle_completed', {
         bundle_number: bundleNumber,
         bundles_completed_total: nextBundlesCompletedTotal,
@@ -156,7 +175,11 @@ export function PrototypeFlow({
 
       <div className="relative z-10">
         {view === 'viewingSession' && (
-          <SessionResultView state={sharedSession} onStartOwn={startBundle} />
+          <SessionResultView
+            state={sharedSession}
+            onStartOwn={startBundle}
+            hasAggregateThreshold={hasAggregateThreshold}
+          />
         )}
 
         {view === 'rating' && bundle[bundleIndex] && (
@@ -181,18 +204,24 @@ export function PrototypeFlow({
               bundleSize={BUNDLE_SIZE}
               onRestart={reset}
               prefillFriendCode={friendCodeFromLink}
-              hasAggregateThreshold={!showThresholdPlaceholder}
+              hasAggregateThreshold={hasAggregateThreshold}
               sessionCode={sessionCode}
               onSessionCodeChange={setSessionCode}
             />
 
-            <label className="flex items-center justify-center gap-2 text-xs font-base text-muted-foreground">
-              <Checkbox
-                checked={showThresholdPlaceholder}
-                onCheckedChange={(checked) => setShowThresholdPlaceholder(checked === true)}
-              />
-              Preview: not-enough-responses state
-            </label>
+            <p className="text-center text-sm text-muted-foreground">
+              Anonymous by design. No accounts, no personal data.
+              <br />
+              Crafted by{' '}
+              <a
+                href="https://erikamurga.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                erikamurga.com
+              </a>
+            </p>
           </div>
         )}
       </div>

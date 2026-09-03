@@ -62,6 +62,20 @@ export async function updateSessionCode(code: string, result: ArchetypeResult): 
   }
 }
 
+/** Total number of saved rating sessions — used to gate the aggregate comparison view. */
+export async function getRatingSessionCount(): Promise<number> {
+  const supabase = createClient()
+  const { count, error } = await supabase
+    .from('rating_sessions')
+    .select('*', { count: 'exact', head: true })
+
+  if (error) {
+    console.error('[getRatingSessionCount] query failed', error)
+    throw new Error('Could not check response count.')
+  }
+  return count ?? 0
+}
+
 export async function getSessionByCode(code: string): Promise<ArchetypeResult | null> {
   const supabase = createClient()
   const { data, error } = await supabase

@@ -6,10 +6,12 @@ import { PrototypeFlow } from './PrototypeFlow'
 
 const getSessionByCode = vi.fn()
 const createSessionCode = vi.fn()
+const getRatingSessionCount = vi.fn().mockResolvedValue(0)
 
 vi.mock('./actions', () => ({
   getSessionByCode: (...args: unknown[]) => getSessionByCode(...args),
   createSessionCode: (...args: unknown[]) => createSessionCode(...args),
+  getRatingSessionCount: (...args: unknown[]) => getRatingSessionCount(...args),
 }))
 
 let searchParams = new URLSearchParams()
@@ -60,6 +62,7 @@ describe('PrototypeFlow', () => {
     searchParams = new URLSearchParams()
     getSessionByCode.mockReset()
     createSessionCode.mockReset()
+    getRatingSessionCount.mockReset().mockResolvedValue(0)
     vi.spyOn(Math, 'random').mockReturnValue(0)
   })
 
@@ -143,21 +146,5 @@ describe('PrototypeFlow', () => {
     await waitFor(() =>
       expect(screen.getByText(/couldn.t be found/i)).toBeInTheDocument()
     )
-  })
-
-  it('flips hasAggregateThreshold when the not-enough-responses preview checkbox is toggled', async () => {
-    const user = userEvent.setup()
-    render(<PrototypeFlow useCases={makeUseCases(3)} domains={domains} />)
-    await start(user)
-
-    for (let i = 0; i < 3; i++) {
-      await setRating(user, 3)
-      await user.click(screen.getByRole('button', { name: /next/i }))
-    }
-
-    await waitFor(() => expect(screen.getByText(/visitor average/i)).toBeInTheDocument())
-
-    await user.click(screen.getByRole('checkbox', { name: /not-enough-responses state/i }))
-    expect(screen.queryByText(/visitor average/i)).not.toBeInTheDocument()
   })
 })
